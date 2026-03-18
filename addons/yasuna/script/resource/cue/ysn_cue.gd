@@ -16,3 +16,6 @@ func has_completed_output() -> bool:
 
 func has_begin_input() -> bool:
 	return true
+
+func get_custom_control() -> Control:
+	return null

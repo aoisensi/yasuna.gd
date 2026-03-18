@@ -18,3 +18,8 @@ func _task() -> void:
 
 func has_completed_output() -> bool:
 	return false
+
+func get_custom_control() -> Control:
+	var label := Label.new()
+	label.text = message
+	return label
