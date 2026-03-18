@@ -3,6 +3,7 @@ extends GraphEdit
 
 const _YSNGraphNode := preload('./ysn_graph_node.gd')
 const _YSNGraphPopup := preload('./ysn_graph_popup.gd')
+const _YSNCueBegin := preload('../../resource/cue/ysn_cue_begin.gd')
 
 var _scenario: YSNScenario
 var scenario: YSNScenario:
@@ -55,6 +56,8 @@ func _on_node_selected(node: Node) -> void:
 	if node is not _YSNGraphNode:
 		return
 	var cue := (node as _YSNGraphNode).get_cue()
+	if cue is _YSNCueBegin:
+		return
 	EditorInterface.get_inspector().edit(cue)
 
 func _on_popup_request(at_position: Vector2) -> void:

@@ -20,6 +20,9 @@ func _init(editor: _YSNGraphEdit, cue: YSNCue) -> void:
 func _ready() -> void:
 	_on_cue_changed()
 
+func _exit_tree() -> void:
+	_clear_all_child()
+
 func _on_cue_changed() -> void:
 	title = _cue.get_title()
 	clear_all_slots()
@@ -39,6 +42,12 @@ func _on_cue_changed() -> void:
 
 	if slot_index == 1:
 		_add_label_control(&'started' if _cue.has_started_output() else &'')
+
+	var custom := _cue.get_custom_control()
+	if custom:
+		print('added')
+		print((custom as Label).text)
+		add_child(custom)
 
 func _on_position_offset_changed() -> void:
 	_editor.scenario.move_cue(_cue, position_offset)
