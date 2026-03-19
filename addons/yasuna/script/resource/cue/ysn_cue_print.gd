@@ -10,16 +10,8 @@ var message: String:
 		return message
 
 
-func get_title() -> StringName:
-	return &'Print'
-
-func _task() -> void:
+func task() -> void:
 	print(message)
 
-func has_completed_output() -> bool:
-	return false
-
-func get_custom_control() -> Control:
-	var label := Label.new()
-	label.text = message
-	return label
+func get_title() -> StringName:
+	return &'Print'
