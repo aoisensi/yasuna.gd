@@ -6,7 +6,7 @@ const _YSNGraphEdit = preload('./ysn_graph_edit.gd')
 
 var _editor: _YSNGraphEdit
 var _cue: YSNCue
-
+var _right_slots: Array[StringName]
 
 func _init(editor: _YSNGraphEdit, cue: YSNCue) -> void:
 	_cue = cue
@@ -28,26 +28,7 @@ func _on_cue_changed() -> void:
 	clear_all_slots()
 	_clear_all_child()
 
-	var slot_index := 0
-
-	if _cue.has_begin_input():
-		set_slot_enabled_left(0, true)
-		set_slot_color_left(0, Color.WHITE)
-		slot_index = 1
-
-	if _cue.has_started_output():
-		set_slot_enabled_right(0, true)
-		set_slot_color_right(0, Color.WHITE)
-		slot_index = 1
-
-	if slot_index == 1:
-		_add_label_control(&'started' if _cue.has_started_output() else &'')
-
-	var custom := _cue.get_custom_control()
-	if custom:
-		print('added')
-		print((custom as Label).text)
-		add_child(custom)
+	_build_slots()
 
 func _on_position_offset_changed() -> void:
 	_editor.scenario.move_cue(_cue, position_offset)
@@ -57,7 +38,25 @@ func _on_resize_end(new_size: Vector2) -> void:
 
 func get_cue() -> YSNCue:
 	return _cue
-		
+
+func _build_slots() -> void:
+	_right_slots = _cue.get_outputs()
+
+	var added := false
+
+	for index in range(_right_slots.size()):
+		if _right_slots.size() > index:
+			_add_label_control(_right_slots[index])
+			set_slot_enabled_right(index, true)
+		else:
+			_add_label_control(&'')
+		added = true
+	
+	if _cue is not _YSNCueBegin:
+		set_slot_enabled_left(0, true)
+		if not added:
+			_add_label_control(&'')
+
 func _clear_all_child() -> void:
 	for child in get_children():
 		remove_child(child)
@@ -72,3 +71,19 @@ func _add_label_control(right: StringName) -> void:
 		label.text = right
 		hbox.add_child(label)
 	add_child(hbox)
+
+func _get_connections() -> Array[Dictionary]:
+	var connections: Array[Dictionary] = []
+	var output_names := _cue.get_outputs()
+	for from_port_name in _cue._outputs.keys():
+		var dict := _cue._outputs[from_port_name]
+		var from_port := output_names.find(from_port_name)
+		for to_cue in dict.keys():
+			connections.append({
+				&'from_node': name,
+				&'from_port': from_port,
+				&'to_node': _editor._nodes[to_cue].name,
+				&'to_port': 0,
+				&'keep_alive': false,
+			})
+	return connections
