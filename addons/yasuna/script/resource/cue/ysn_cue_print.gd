@@ -15,3 +15,9 @@ func task() -> void:
 
 func get_title() -> StringName:
 	return &'Print'
+
+func get_editor_custom_body_script() -> Script:
+	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_print_body.gd')
+
+func is_editor_resizable_node() -> bool:
+	return true
