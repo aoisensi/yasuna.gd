@@ -13,13 +13,15 @@ func _init() -> void:
 func _ready() -> void:
 	if auto_begin:
 		for scenario in auto_begin:
-			act(scenario)
+			if scenario:
+				act(scenario)
 
 func act(scenario: YSNScenario) -> void:
 	_cue_act.emit(scenario._cue_begin)
 
 func _on_cue_act(cue: YSNCue) -> void:
-	cue = cue._duplicate_cue(self)
+	if not cue._original:
+		cue = cue._duplicate_cue(self)
 	if cue is YSNCueAsync:
 		_running_cues[cue] = false
 	cue._action()
