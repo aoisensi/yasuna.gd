@@ -1,23 +1,23 @@
 @tool
-class_name YSNCuePrint extends YSNCue
+class_name YSNCuePrint extends YSNCueStateless
 
 @export_multiline()
 var message: String:
 	set(value):
-		message = value
-		emit_changed()
+		if message != value:
+			message = value
+			emit_changed()
 	get:
 		return message
 
-
-func task() -> void:
+func _perform(context: YSNContext) -> void:
 	print(message)
 
-func get_title() -> StringName:
+func _get_title() -> StringName:
 	return &'Print'
 
-func get_editor_custom_body_script() -> Script:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_print_body.gd')
+func _get_editor_custom_body() -> Control:
+	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_print_body.gd').new(self)
 
-func is_editor_resizable_node() -> bool:
+func _is_editor_node_resizable() -> bool:
 	return true

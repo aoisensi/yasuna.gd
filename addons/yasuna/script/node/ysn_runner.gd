@@ -1,32 +1,23 @@
 class_name YSNRunner extends Node
 
-@export var auto_begin: Array[YSNScenario]
+@export var auto_acts: Array[YSNScenario]
 
-var _running_cues: Dictionary[YSNCue, bool] = {} # actually this is a set
+var instances: Array[YSNInstance] = []
 
-signal _cue_act(cue: YSNCue)
-
-
-func _init() -> void:
-	_cue_act.connect(_on_cue_act)
 
 func _ready() -> void:
-	if auto_begin:
-		for scenario in auto_begin:
+	if auto_acts:
+		for scenario in auto_acts:
 			if scenario:
 				act(scenario)
 
 func act(scenario: YSNScenario) -> void:
-	_cue_act.emit(scenario._cue_begin)
+	var instance := YSNInstance.new()
+	instance._runner = self
+	instance._scenario = scenario
+	instances.append(instance)
+	instance._queue_cue(1, &'')
+	instance._run()
 
-func _on_cue_act(cue: YSNCue) -> void:
-	if not cue._original:
-		cue = cue._duplicate_cue(self)
-	if cue is YSNCueAsync:
-		_running_cues[cue] = false
-	cue._action()
-
-func _cue_finished(cue: YSNCue) -> void:
-	if cue.is_async_task():
-		_running_cues.erase(cue)
-	cue.free()
+func _release_instance(instance: YSNInstance) -> void:
+	instances.erase(instance)

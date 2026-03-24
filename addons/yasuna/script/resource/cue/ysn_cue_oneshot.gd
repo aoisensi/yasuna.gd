@@ -1,0 +1,31 @@
+@tool
+class_name YSNCueOneShot extends YSNCueTrigger
+
+const EMIT_FLOW_ONCE = &'once'
+
+
+func _get_receive_flows() -> Array[StringName]:
+	var flows := super._get_receive_flows()
+	flows.push_front(YSNCue.RECEIVE_FLOW_ENTERED)
+	return flows
+
+func _get_title() -> StringName:
+	return &'OneShot'
+
+func _get_emit_flows() -> Array[StringName]:
+	return [EMIT_FLOW_ONCE]
+
+func _get_state_class() -> Script:
+	return State
+
+
+class State extends YSNCueTrigger.State:
+
+	@export var evaluated := false
+
+	func _evaluate(context: YSNContext) -> void:
+		if context.flow == YSNCue.RECEIVE_FLOW_ENTERED:
+			if evaluated:
+				return
+			evaluated = true
+			context.emit_flow(EMIT_FLOW_ONCE)

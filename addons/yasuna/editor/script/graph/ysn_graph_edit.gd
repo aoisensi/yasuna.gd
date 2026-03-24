@@ -9,11 +9,8 @@ var _scenario: YSNScenario
 var scenario: YSNScenario:
 	get:
 		return _scenario
-var _popup: _YSNGraphPopup
 
-var _nodes: Dictionary[YSNCue, _YSNGraphNode] = {}
-
-var _connections_cache: Dictionary[YSNCue, Array] = {}
+var _cue_nodes: Dictionary[int, _YSNGraphNode] = {}
 
 
 func _init(scenario: YSNScenario) -> void:
@@ -21,12 +18,10 @@ func _init(scenario: YSNScenario) -> void:
 	
 	right_disconnects = true
 
-	_popup = _YSNGraphPopup.new(self)
-	add_child(_popup)
 	popup_request.connect(_on_popup_request)
 	delete_nodes_request.connect(_on_delete_node_request)
-	connection_request.connect(_on_connection_request)
-	disconnection_request.connect(_on_disconnection_request)
+	connection_request.connect(_on_connection_request.bind(true))
+	disconnection_request.connect(_on_connection_request.bind(false))
 	node_selected.connect(_on_node_selected)
 	_scenario.changed.connect(_on_scenario_changed)
 
@@ -34,95 +29,66 @@ func _ready() -> void:
 	_on_scenario_changed()
 
 func _exit_tree() -> void:
-	ResourceSaver.save(scenario)
+	if scenario.resource_path:
+		ResourceSaver.save(scenario)
 
-func _add_node(cue: YSNCue) -> _YSNGraphNode:
+func _on_scenario_changed() -> void:
+	var cue_list := scenario.get_cue_list()
+	var ids: Array = _cue_nodes.keys() # for remove not exsits nodes
+
+	for id in cue_list:
+		var node := _get_cue_node(id)
+		if not node:
+			node = _add_cue_node(scenario.get_cue(id))
+		node.position_offset = scenario.get_cue_position(id)
+		ids.erase(id)
+
+	for id in ids:
+		_remove_cue_node(id)
+	connections = scenario.get_cue_connections()
+
+func _get_cue_node(id: int) -> _YSNGraphNode:
+	return _cue_nodes.get(id)
+
+func _add_cue_node(cue: YSNCue) -> _YSNGraphNode:
 	var node := _YSNGraphNode.new(self, cue)
 	add_child(node)
-	_nodes[cue] = node
+	node.name = YSNScenario._get_editor_node_name(cue.id)
+	_cue_nodes[cue.id] = node
 	return node
 
-func _on_connection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int) -> void:
-	if to_port != 0:
-		push_error('Port number %d is not supported. [BUG]' % to_port)
-		return
-	var from_cue := _get_node_by_name(from_node).get_cue()
-	var to_cue := _get_node_by_name(to_node).get_cue()
-	var output := from_cue.get_outputs()[from_port]
-	scenario.connect_cue(from_cue, output, to_cue)
+func _remove_cue_node(id: int) -> void:
+	var node := _cue_nodes[id]
+	remove_child(node)
+	node.queue_free()
+	_cue_nodes.erase(id)
 
-func _on_disconnection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int) -> void:
-	if to_port != 0:
-		push_error('Port number %d is not supported. [BUG]' % to_port)
-		return
-	var from_cue := _get_node_by_name(from_node).get_cue()
-	var to_cue := _get_node_by_name(to_node).get_cue()
-	var output := from_cue.get_outputs()[from_port]
-	scenario.disconnect_cue(from_cue, output, to_cue)
+func _on_connection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int, is_connect: bool) -> void:
+	var from := get_node(String(from_node)) as _YSNGraphNode
+	var emitter_id := _cue_nodes.find_key(from)
+	var emit_flow := from._cue._get_emit_flows()[from_port]
+	var to := get_node(String(to_node)) as _YSNGraphNode
+	var receiver_id := _cue_nodes.find_key(to)
+	var receive_flow := to._cue._get_receive_flows()[to_port]
+	if is_connect:
+		var error := scenario.connect_cues(emitter_id, emit_flow, receiver_id, receive_flow)
+		if error:
+			push_error(error_string(error))
+	else:
+		scenario.disconnect_cues(emitter_id, emit_flow, receiver_id, receive_flow)
 
 func _on_delete_node_request(names: Array[StringName]) -> void:
 	for name in names:
-		var node := _get_node_by_name(name)
-		scenario.remove_cue(node.get_cue())
-		remove_child(node)
-		node.queue_free()
-
-func _on_scenario_changed() -> void:
-	var cues := _scenario.get_cues()
-	for cue in cues:
-		var node: _YSNGraphNode = _nodes.get(cue)
-		if not node:
-			node = _add_node(cue)
-		node.position_offset = _scenario.get_cue_position(cue)
-		node.size = _scenario.get_cue_size(cue)
-
-		_cache_cue_connections(cue)
-	_apply_connections_by_cache()
+		var node := get_node(String(name)) as _YSNGraphNode
+		scenario.remove_cue(node._cue.id)
 
 func _on_node_selected(node: Node) -> void:
-	if node is not _YSNGraphNode:
-		return
-	var cue := (node as _YSNGraphNode).get_cue()
-	if cue is _YSNCueBegin:
-		return
-	EditorInterface.edit_resource(cue)
+	if node is _YSNGraphNode:
+		EditorInterface.edit_resource(node._cue)
 
 func _on_popup_request(at_position: Vector2) -> void:
-	_popup.popup_on_parent(Rect2(at_position + global_position, Vector2.ZERO))
-	_popup.spawn_position = at_position + scroll_offset
-
-func _clear() -> void:
-	for child in get_children():
-		if child is _YSNGraphNode:
-			remove_child(child)
-			child.queue_free()
-
-func _get_node_by_name(name: StringName) -> _YSNGraphNode:
-	return get_node(str(name)) as _YSNGraphNode
-
-func _cache_cue_connections(cue: YSNCue) -> void:
-	var cache: Array[Dictionary] = []
-	var from_node := _nodes[cue]
-	var from_outputs := cue.get_outputs()
-	var conns := scenario._get_cue_data_connections(cue)
-	for output in from_outputs:
-		var from_port := from_outputs.find(output)
-		var nexts := scenario.get_next_cues(cue, output)
-		for to_cue in nexts:
-			var to_node := _nodes.get(to_cue)
-			if not to_node:
-				continue
-			cache.append({
-				&'from_node': from_node.name,
-				&'from_port': from_port,
-				&'to_node': to_node.name,
-				&'to_port': 0, # always 0
-				&'keep_alive': false,
-			})
-	_connections_cache[cue] = cache
-
-func _apply_connections_by_cache() -> void:
-	var conns := []
-	for conn in _connections_cache.values():
-		conns.append_array(conn)
-	connections = conns
+	var popup := _YSNGraphPopup.new(self)
+	popup.name = &'Popup'
+	add_child(popup)
+	popup.popup_on_parent(Rect2(at_position + global_position, Vector2.ZERO))
+	popup.spawn_position = at_position + scroll_offset

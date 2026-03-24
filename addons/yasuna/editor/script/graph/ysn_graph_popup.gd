@@ -3,7 +3,7 @@ extends PopupMenu
 const _YSNGraphEdit = preload('./ysn_graph_edit.gd')
 
 var _graph_edit: _YSNGraphEdit
-var _scripts: Dictionary[int, Script]
+var _scripts: Dictionary[int, Script] = {}
 
 var spawn_position: Vector2
 
@@ -19,11 +19,13 @@ func _ready() -> void:
 
 func _on_id_pressed(id: int) -> void:
 	var scenario := _graph_edit.scenario
-	scenario.add_cue(_scripts[id].new(), spawn_position)
+	var script := _scripts[id]
+	var cue_id := scenario.get_valid_cue_id()
+	scenario.add_cue(script.new(), cue_id, spawn_position)
 
 func _on_project_settings_settings_changed() -> void:
 	clear(true)
-	_scripts = {}
+	_scripts.clear()
 	var class_list := ProjectSettings.get_global_class_list()
 
 	for id in range(class_list.size()):

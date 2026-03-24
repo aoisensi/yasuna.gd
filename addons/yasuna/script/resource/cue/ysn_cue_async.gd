@@ -1,15 +1,37 @@
+@tool
 @abstract
-class_name YSNCueAsync extends YSNCue
+class_name YSNCueAsync extends YSNCueStateful
 
-const OUTPUT_COMPLETED = &'completed'
+const EMIT_FLOW_STARTED = &'started'
+const EMIT_FLOW_COMPLETED = &'completed'
 
 
-func task() -> void:
-	await task_async()
-	emit(OUTPUT_COMPLETED)
+func _received(context: YSNContext) -> void:
+	if context.flow != RECEIVE_FLOW_ENTERED:
+		return
+	var state := context.create_state()
+	assert(state is YSNCueAsync.State)
+	state._received(context)
+	context.emit_flow(EMIT_FLOW_STARTED)
+
+func _get_receive_flows() -> Array[StringName]:
+	return [RECEIVE_FLOW_ENTERED]
+
+func _get_emit_flows() -> Array[StringName]:
+	return [EMIT_FLOW_STARTED, EMIT_FLOW_COMPLETED]
+
+func _get_editor_node_color() -> Color:
+	return Color.GREEN
+
 
 @abstract
-func task_async() -> void
+class State extends YSNCueStateful.State:
 
-func get_outputs() -> Array[StringName]:
-	return [OUTPUT_STARTED, OUTPUT_COMPLETED]
+	func _received(context: YSNContext) -> void:
+		await _perfome(context)
+		context.emit_flow(EMIT_FLOW_COMPLETED)
+		context.remove_state(self)
+		context._release()
+
+	@abstract
+	func _perfome(context: YSNContext) -> void

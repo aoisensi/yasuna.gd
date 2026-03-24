@@ -1,9 +1,21 @@
 @tool
-extends YSNCue
+class_name YSNCueBegin extends YSNCue
+
+const EMITTER_START = &'start'
 
 
-func task() -> void:
-	pass
+func _received(context: YSNContext) -> void:
+	context.emit_flow(EMITTER_START)
+	context._release()
 
-func get_title() -> StringName:
+func _get_receive_flows() -> Array[StringName]:
+	return []
+	
+func _get_emit_flows() -> Array[StringName]:
+	return [EMITTER_START]
+
+func _get_title() -> StringName:
 	return &'Begin'
+
+func _get_editor_node_color() -> Color:
+	return Color.RED
