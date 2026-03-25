@@ -16,6 +16,7 @@ func _init(cue: YSNCueWait) -> void:
 	suffix = 's'
 	value_changed.connect(_on_value_changed)
 
+func _ready() -> void:
 	_on_cue_changed()
 
 func _on_value_changed(value: float) -> void:

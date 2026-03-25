@@ -12,6 +12,7 @@ func _init(cue: YSNCuePrint) -> void:
 	custom_minimum_size = Vector2(240.0, 60.0)
 	text_changed.connect(_on_text_changed)
 
+func _ready() -> void:
 	_on_cue_changed()
 
 func _on_text_changed() -> void:

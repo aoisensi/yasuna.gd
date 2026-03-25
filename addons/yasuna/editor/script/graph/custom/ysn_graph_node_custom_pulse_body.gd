@@ -14,8 +14,11 @@ func _init(cue: YSNCuePulse) -> void:
 	
 	_count_spinner = EditorSpinSlider.new()
 	_count_spinner.allow_greater = true
+	_count_spinner.min_value = -1
 	_count_spinner.max_value = 100
-	_count_spinner.suffix = 'times'
+	_count_spinner.editing_integer = true
+	_count_spinner.suffix = ' times'
+	_count_spinner.value_changed.connect(_on_count_spinner_changed)
 	add_child(_count_spinner)
 
 	_wait_spinner = EditorSpinSlider.new()
@@ -24,7 +27,11 @@ func _init(cue: YSNCuePulse) -> void:
 	_wait_spinner.min_value = 0.05
 	_wait_spinner.step = 0.01
 	_wait_spinner.suffix = 's'
+	_wait_spinner.value_changed.connect(_on_wait_spinner_changed)
 	add_child(_wait_spinner)
+
+func _ready() -> void:
+	_on_cue_changed()
 
 func _on_count_spinner_changed(value: float) -> void:
 	_cue.count = value

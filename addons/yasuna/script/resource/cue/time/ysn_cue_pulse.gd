@@ -7,10 +7,9 @@ const RECEIVE_FLOW_RESUME = &'resume'
 const EMIT_FLOW_PULSE = &'pulse'
 
 
-@export_range(0, 100)
-var count := 0:
+@export var count := -1:
 	set(value):
-		value = maxi(0, value)
+		value = maxi(-1, value)
 		if count != value:
 			count = value
 			emit_changed()
@@ -62,6 +61,8 @@ class State extends YSNCueReactive.State:
 			RECEIVE_FLOW_START:
 				_destroy(context)
 				counter = 0
+				if cue.count == 0:
+					return
 				_timer = Timer.new()
 				context.runner.add_child(_timer, false, Node.INTERNAL_MODE_BACK)
 				_timer.wait_time = cue.time_sec
