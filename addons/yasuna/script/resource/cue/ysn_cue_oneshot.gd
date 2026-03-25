@@ -1,5 +1,5 @@
 @tool
-class_name YSNCueOneShot extends YSNCueTrigger
+class_name YSNCueOneShot extends YSNCueReactive
 
 const EMIT_FLOW_ONCE = &'once'
 
@@ -19,7 +19,7 @@ func _get_state_class() -> Script:
 	return State
 
 
-class State extends YSNCueTrigger.State:
+class State extends YSNCueReactive.State:
 
 	@export var evaluated := false
 

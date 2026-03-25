@@ -1,5 +1,5 @@
 @tool
-class_name YSNCuePulse extends YSNCueTrigger
+class_name YSNCuePulse extends YSNCueReactive
 
 const RECEIVE_FLOW_START = &'start'
 const RECEIVE_FLOW_PAUSE = &'pause'
@@ -51,7 +51,7 @@ func _get_editor_custom_body() -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_pulse_body.gd').new(self)
 
 
-class State extends YSNCueTrigger.State:
+class State extends YSNCueReactive.State:
 	
 	var _timer: Timer
 	@export var counter: int

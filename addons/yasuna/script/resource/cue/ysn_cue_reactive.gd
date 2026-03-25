@@ -1,6 +1,6 @@
 @tool
 @abstract
-class_name YSNCueTrigger extends YSNCueStateful
+class_name YSNCueReactive extends YSNCueStateful
 
 const RECEIVE_FLOW_RESET = &'reset'
 const EMIT_FLOW_DONE = &'done'
@@ -11,7 +11,7 @@ func _received(context: YSNContext) -> void:
 		context.remove_states()
 		return
 	var state = context.get_or_create_state()
-	assert(state is YSNCueTrigger.State)
+	assert(state is YSNCueReactive.State)
 	state._received(context)
 
 func _get_receive_flows() -> Array[StringName]:

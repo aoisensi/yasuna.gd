@@ -1,5 +1,5 @@
 @tool
-class_name YSNCueEvery extends YSNCueTrigger
+class_name YSNCueEvery extends YSNCueReactive
 
 const MIN_FLOWS = 2
 const MAX_FLOWS = 30
@@ -35,7 +35,7 @@ func _get_editor_custom_action() -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'flows')
 
 
-class State extends YSNCueTrigger.State:
+class State extends YSNCueReactive.State:
 
 	@export var flags := 0
 
