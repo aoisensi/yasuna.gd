@@ -4,7 +4,7 @@ class_name YSNCuePulse extends YSNCueReactive
 const RECEIVE_FLOW_START = &'start'
 const RECEIVE_FLOW_PAUSE = &'pause'
 const RECEIVE_FLOW_RESUME = &'resume'
-const EMIT_FLOW_PULSE = &'pulse'
+const EMIT_FLOW_PULSED = &'pulsed'
 
 
 @export var count := -1:
@@ -33,7 +33,7 @@ func _get_title() -> StringName:
 	return &'Pulse'
 
 func _get_emit_flows() -> Array[StringName]:
-	return [EMIT_FLOW_PULSE]
+	return [EMIT_FLOW_PULSED]
 
 func _get_receive_flows() -> Array[StringName]:
 	var flows: Array[StringName] = [RECEIVE_FLOW_START, RECEIVE_FLOW_PAUSE, RECEIVE_FLOW_RESUME]
@@ -85,7 +85,7 @@ class State extends YSNCueReactive.State:
 				_timer = null
 			
 	func _pulsed(context: YSNContext) -> void:
-		context.emit_flow(EMIT_FLOW_PULSE)
+		context.emit_flow(EMIT_FLOW_PULSED)
 		counter += 1
 		var cue := context.cue as YSNCuePulse
 		if counter == cue.count:
