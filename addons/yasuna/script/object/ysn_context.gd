@@ -35,30 +35,25 @@ func _init(instance: YSNInstance, id: int, flow: StringName) -> void:
 
 func emit_flow(flow: StringName) -> void:
 	for connected in scenario.get_connected_cues(id, flow):
-		instance._queue_cue(connected.cue, connected.flow)
+		instance._queue_emit(connected.cue, connected.flow)
 	instance._run()
 
-func create_state() -> YSNCueStateful.State:
+func _create_state() -> YSNCueStateful.State:
 	assert(cue is YSNCueStateful)
 	return instance._create_state(cue)
 
-func get_state() -> YSNCueStateful.State:
+func _get_state() -> YSNCueStateful.State:
 	return instance._get_states(cue).front()
 
-func get_or_create_state() -> YSNCueStateful.State:
+func _get_or_create_state() -> YSNCueStateful.State:
 	assert(cue is YSNCueStateful)
 	return instance._get_or_create_state(cue)
 
-func remove_states() -> void:
+func _remove_states() -> void:
 	for state in instance._get_states(cue):
 		state._destroy(self)
 	instance._remove_states(cue)
 
-func remove_state(state: YSNCueStateful.State) -> void:
+func _remove_state(state: YSNCueStateful.State) -> void:
 	state._destroy(self)
 	instance._remove_state(state)
-
-func _release() -> void:
-	instance._counter -= 1
-	if not instance._counter:
-		runner._release_instance(instance)

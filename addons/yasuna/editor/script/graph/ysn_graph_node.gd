@@ -6,15 +6,17 @@ const _YSNGraphEdit = preload('./ysn_graph_edit.gd')
 
 var _editor: _YSNGraphEdit
 var _cue: YSNCue
+var _id: int
 
 var _slots_node: Array[Control] = []
 var _receive_flows: Array[StringName] = []
 var _emit_flows: Array[StringName] = []
 
 
-func _init(editor: _YSNGraphEdit, cue: YSNCue) -> void:
-	_cue = cue
+func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int) -> void:
 	_editor = editor
+	_cue = cue
+	_id = id
 	_cue.changed.connect(_on_cue_changed)
 	dragged.connect(_on_dragged)
 	cue.script_changed.connect(_on_cue_script_changed.call_deferred)
@@ -37,7 +39,7 @@ func _on_cue_script_changed() -> void:
 	_custom_action = _cue._get_editor_custom_action()
 
 func _on_dragged(from: Vector2, to: Vector2) -> void:
-	_editor.scenario.set_cue_position(_cue.id, to)
+	_editor.scenario.set_cue_position(_id, to)
 
 func _check_flows() -> void:
 	var receive_flows := _cue._get_receive_flows()
@@ -79,7 +81,7 @@ func _rebuild_flow_nodes() -> void:
 		_slots_node.append(hbox)
 
 func _on_resize_request(new_size: Vector2) -> void:
-	_editor.scenario.set_cue_size(_cue.id, new_size)
+	_editor.scenario.set_cue_size(_id, new_size)
 
 var _custom_body: Control:
 	set(value):

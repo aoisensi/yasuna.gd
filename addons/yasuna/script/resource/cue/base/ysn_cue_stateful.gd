@@ -5,12 +5,15 @@ class_name YSNCueStateful extends YSNCue
 @abstract
 func _get_state_class() -> Script
 
+func _is_ephemeral() -> bool:
+	return false
+
 
 @abstract
 class State extends Resource:
 
-	@export var _cue: YSNCue
-	var cue: YSNCue:
+	@export var _cue: YSNCueStateful
+	var cue: YSNCueStateful:
 		get:
 			return _cue
 

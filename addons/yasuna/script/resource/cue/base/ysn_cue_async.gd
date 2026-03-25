@@ -9,7 +9,7 @@ const EMIT_FLOW_COMPLETED = &'completed'
 func _received(context: YSNContext) -> void:
 	if context.flow != RECEIVE_FLOW_ENTER:
 		return
-	var state := context.create_state()
+	var state := context._create_state()
 	assert(state is YSNCueAsync.State)
 	state._received(context)
 	context.emit_flow(EMIT_FLOW_STARTED)
@@ -30,8 +30,7 @@ class State extends YSNCueStateful.State:
 	func _received(context: YSNContext) -> void:
 		await _perfome(context)
 		context.emit_flow(EMIT_FLOW_COMPLETED)
-		context.remove_state(self)
-		context._release()
+		context._remove_state(self)
 
 	@abstract
 	func _perfome(context: YSNContext) -> void

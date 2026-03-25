@@ -13,7 +13,6 @@ var _cues: Dictionary = {
 			var data = value[id]
 			var cue := data.cue as YSNCue
 			cue._scenario = self
-			cue._id = id
 			cue.changed.connect(_on_cue_changed.bind(id))
 		_cues = value
 	get:
@@ -26,7 +25,6 @@ var _cues_emit_flows: Dictionary[int, Array]
 func add_cue(cue: YSNCue, id: int, position := Vector2.ZERO) -> void:
 	assert(cue)
 	assert(not _cues.has(id))
-	cue._id = id
 	cue._scenario = self
 	var data := {&'cue': cue}
 	cue.changed.connect(_on_cue_changed.bind(id))

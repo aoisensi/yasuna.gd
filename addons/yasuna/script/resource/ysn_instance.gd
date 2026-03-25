@@ -9,10 +9,16 @@ var scenario: YSNScenario:
 	get:
 		return _scenario
 @export var _states: Dictionary[YSNCueStateful, Array] = {}
-@export var _counter: int = 0
+@export var _counter: int = 0:
+	set(value):
+		_counter = value
+		_check_alive()
+	get:
+		return _counter
 
 var _queue: Array[Dictionary] = []
 var _running := false
+var is_released := false
 
 func _get_states(cue: YSNCueStateful) -> Array[YSNCueStateful.State]:
 	var result: Array[YSNCueStateful.State] = []
@@ -29,6 +35,8 @@ func _get_or_create_state(cue: YSNCueStateful) -> YSNCueStateful.State:
 	return states.front()
 
 func _create_state(cue: YSNCueStateful) -> YSNCueStateful.State:
+	if not cue._is_ephemeral():
+		_counter += 1
 	var state = cue._get_state_class().new()
 	assert(state is YSNCueStateful.State)
 	state._cue = cue
@@ -37,18 +45,28 @@ func _create_state(cue: YSNCueStateful) -> YSNCueStateful.State:
 	return state
 
 func _remove_state(state: YSNCueStateful.State) -> void:
-	var states := _states.get(state.cue, [])
-	states.erase(state)
+	var states: Array = _states.get(state.cue)
 	if not states:
-		_states.erase(state.cue)
+		return
+	if states.has(state):
+		states.erase(state)
+		if not state.cue._is_ephemeral():
+			_counter -= 1
+		if not states:
+			_states.erase(state.cue)
 
 func _remove_states(cue: YSNCueStateful) -> void:
+	if not cue._is_ephemeral():
+		_counter -= _states.get(cue, []).size()
 	_states.erase(cue)
 
 func _add_state(state: YSNCueStateful.State) -> void:
 	_states.get_or_add(state.cue, []).append(state)
 
 func _run() -> void:
+	if is_released:
+		push_warning()
+
 	if _running:
 		return
 
@@ -62,9 +80,18 @@ func _run() -> void:
 		cue._received(context)
 	_running = false
 
-func _queue_cue(cue: int, flow: StringName) -> void:
-	_counter += 1
+	_check_alive()
+
+func _queue_emit(cue_id: int, emit_flow: StringName) -> void:
 	_queue.append({
-		cue = cue,
-		flow = flow,
+		cue = cue_id,
+		flow = emit_flow,
 	})
+
+func _check_alive() -> void:
+	if _counter == 0 and not _running:
+		_release()
+
+func _release() -> void:
+	is_released = true
+	runner._release_instance(self)

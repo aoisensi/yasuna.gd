@@ -6,7 +6,6 @@ const EMITTER_START = &'start'
 
 func _received(context: YSNContext) -> void:
 	context.emit_flow(EMITTER_START)
-	context._release()
 
 func _get_receive_flows() -> Array[StringName]:
 	return []

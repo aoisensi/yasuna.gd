@@ -13,7 +13,6 @@ func _received(context: YSNContext) -> void:
 		return
 	_perform(context)
 	context.emit_flow(EMIT_FLOW_NEXT)
-	context._release()
 
 func _get_receive_flows() -> Array[StringName]:
 	return [RECEIVE_FLOW_ENTER]

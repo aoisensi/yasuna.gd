@@ -44,7 +44,7 @@ func _get_state_class() -> Script:
 	return State
 
 func _is_ephemeral() -> bool:
-	return true
+	return false
 
 func _get_editor_custom_body() -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_pulse_body.gd').new(self)

@@ -8,9 +8,9 @@ const EMIT_FLOW_DONE = &'done'
 
 func _received(context: YSNContext) -> void:
 	if context.flow == RECEIVE_FLOW_RESET:
-		context.remove_states()
+		context._remove_states()
 		return
-	var state = context.get_or_create_state()
+	var state = context._get_or_create_state()
 	assert(state is YSNCueReactive.State)
 	state._received(context)
 
@@ -21,7 +21,7 @@ func _get_state_class() -> Script:
 	return State
 
 func _is_ephemeral() -> bool:
-	return false
+	return true
 
 func _get_editor_node_color() -> Color:
 	return Color.YELLOW

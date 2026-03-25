@@ -39,7 +39,7 @@ func _on_scenario_changed() -> void:
 	for id in cue_list:
 		var node := _get_cue_node(id)
 		if not node:
-			node = _add_cue_node(scenario.get_cue(id))
+			node = _create_cue_node(id)
 		node.position_offset = scenario.get_cue_position(id)
 		ids.erase(id)
 
@@ -50,11 +50,12 @@ func _on_scenario_changed() -> void:
 func _get_cue_node(id: int) -> _YSNGraphNode:
 	return _cue_nodes.get(id)
 
-func _add_cue_node(cue: YSNCue) -> _YSNGraphNode:
-	var node := _YSNGraphNode.new(self, cue)
+func _create_cue_node(id: int) -> _YSNGraphNode:
+	var cue := scenario.get_cue(id)
+	var node := _YSNGraphNode.new(self, cue, id)
 	add_child(node)
-	node.name = YSNScenario._get_editor_node_name(cue.id)
-	_cue_nodes[cue.id] = node
+	node.name = YSNScenario._get_editor_node_name(id)
+	_cue_nodes[id] = node
 	return node
 
 func _remove_cue_node(id: int) -> void:
@@ -80,7 +81,7 @@ func _on_connection_request(from_node: StringName, from_port: int, to_node: Stri
 func _on_delete_node_request(names: Array[StringName]) -> void:
 	for name in names:
 		var node := get_node(String(name)) as _YSNGraphNode
-		scenario.remove_cue(node._cue.id)
+		scenario.remove_cue(node._id)
 
 func _on_node_selected(node: Node) -> void:
 	if node is _YSNGraphNode:
