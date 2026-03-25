@@ -2,7 +2,7 @@
 @abstract
 class_name YSNCue extends Resource
 
-const RECEIVE_FLOW_ENTERED = &'entered'
+const RECEIVE_FLOW_ENTER = &'enter'
 
 
 var _id: int

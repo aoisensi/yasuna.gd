@@ -7,7 +7,7 @@ const EMIT_FLOW_COMPLETED = &'completed'
 
 
 func _received(context: YSNContext) -> void:
-	if context.flow != RECEIVE_FLOW_ENTERED:
+	if context.flow != RECEIVE_FLOW_ENTER:
 		return
 	var state := context.create_state()
 	assert(state is YSNCueAsync.State)
@@ -15,7 +15,7 @@ func _received(context: YSNContext) -> void:
 	context.emit_flow(EMIT_FLOW_STARTED)
 
 func _get_receive_flows() -> Array[StringName]:
-	return [RECEIVE_FLOW_ENTERED]
+	return [RECEIVE_FLOW_ENTER]
 
 func _get_emit_flows() -> Array[StringName]:
 	return [EMIT_FLOW_STARTED, EMIT_FLOW_COMPLETED]

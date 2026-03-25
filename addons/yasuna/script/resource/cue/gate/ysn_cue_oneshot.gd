@@ -6,7 +6,7 @@ const EMIT_FLOW_ONCE = &'once'
 
 func _get_receive_flows() -> Array[StringName]:
 	var flows := super._get_receive_flows()
-	flows.push_front(YSNCue.RECEIVE_FLOW_ENTERED)
+	flows.push_front(YSNCue.RECEIVE_FLOW_ENTER)
 	return flows
 
 func _get_title() -> StringName:
@@ -24,7 +24,7 @@ class State extends YSNCueReactive.State:
 	@export var evaluated := false
 
 	func _evaluate(context: YSNContext) -> void:
-		if context.flow == YSNCue.RECEIVE_FLOW_ENTERED:
+		if context.flow == YSNCue.RECEIVE_FLOW_ENTER:
 			if evaluated:
 				return
 			evaluated = true
