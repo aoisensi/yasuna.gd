@@ -13,7 +13,7 @@ var message: String:
 func _perform(context: YSNContext) -> void:
 	print(message)
 
-func _get_title() -> StringName:
+func _get_editor_title() -> StringName:
 	return &'Print'
 
 func _get_editor_custom_body() -> Control:

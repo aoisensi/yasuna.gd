@@ -25,7 +25,7 @@ func _get_receive_flows() -> Array[StringName]
 @abstract
 func _get_emit_flows() -> Array[StringName]
 
-func _get_title() -> StringName:
+func _get_editor_title() -> StringName:
 	return get_script().get_global_name()
 
 func _get_editor_custom_body() -> Control:

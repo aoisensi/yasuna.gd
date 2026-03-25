@@ -9,7 +9,7 @@ func _get_receive_flows() -> Array[StringName]:
 	flows.push_front(YSNCue.RECEIVE_FLOW_ENTER)
 	return flows
 
-func _get_title() -> StringName:
+func _get_editor_title() -> StringName:
 	return &'OneShot'
 
 func _get_emit_flows() -> Array[StringName]:

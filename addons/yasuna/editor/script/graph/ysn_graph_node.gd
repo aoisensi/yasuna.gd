@@ -25,7 +25,7 @@ func _ready() -> void:
 	_on_cue_script_changed()
 
 func _on_cue_changed() -> void:
-	title = _cue._get_title()
+	title = _cue._get_editor_title()
 	_check_flows()
 	resizable = _cue._is_editor_node_resizable()
 	if not resizable:

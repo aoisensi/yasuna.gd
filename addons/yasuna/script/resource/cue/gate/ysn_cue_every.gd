@@ -28,7 +28,7 @@ func _get_emit_flows() -> Array[StringName]:
 func _get_state_class() -> Script:
 	return State
 
-func _get_title() -> StringName:
+func _get_editor_title() -> StringName:
 	return &'Every'
 
 func _get_editor_custom_action() -> Control:

@@ -29,7 +29,7 @@ const EMIT_FLOW_PULSED = &'pulsed'
 @export var ignore_time_scale := false
 
 
-func _get_title() -> StringName:
+func _get_editor_title() -> StringName:
 	return &'Pulse'
 
 func _get_emit_flows() -> Array[StringName]:

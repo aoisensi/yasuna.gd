@@ -13,7 +13,7 @@ class_name YSNCueWait extends YSNCueAsync
 @export var ignore_time_scale := false
 
 
-func _get_title() -> StringName:
+func _get_editor_title() -> StringName:
 	return &'Wait'
 
 func _get_state_class() -> Script:
