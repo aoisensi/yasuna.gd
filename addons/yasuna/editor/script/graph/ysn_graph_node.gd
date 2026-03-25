@@ -1,8 +1,8 @@
 @tool
 extends GraphNode
 
-const _YSNCueBegin = preload('../../../script/resource/cue/ysn_cue_begin.gd')
 const _YSNGraphEdit = preload('./ysn_graph_edit.gd') 
+
 
 var _editor: _YSNGraphEdit
 var _cue: YSNCue

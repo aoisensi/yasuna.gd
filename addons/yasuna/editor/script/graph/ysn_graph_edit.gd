@@ -3,7 +3,7 @@ extends GraphEdit
 
 const _YSNGraphNode := preload('./ysn_graph_node.gd')
 const _YSNGraphPopup := preload('./ysn_graph_popup.gd')
-const _YSNCueBegin := preload('../../../script/resource/cue/ysn_cue_begin.gd')
+
 
 var _scenario: YSNScenario
 var scenario: YSNScenario:
