@@ -22,6 +22,8 @@ class State extends Resource:
 		get:
 			return _instance
 
+	func _setup(context: YSNContext) -> void:
+		pass
 
 	@abstract
 	func _received(context: YSNContext) -> void

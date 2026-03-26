@@ -25,15 +25,6 @@ func _get_states(cue: YSNCueStateful) -> Array[YSNCueStateful.State]:
 	result.assign(_states.get_or_add(cue, []))
 	return result
 
-func _get_or_create_state(cue: YSNCueStateful) -> YSNCueStateful.State:
-	var states: Array = _states.get_or_add(cue, [])
-	var size := states.size()
-	if size == 0:
-		return _create_state(cue)
-	if size > 1:
-		push_warning()
-	return states.front()
-
 func _create_state(cue: YSNCueStateful) -> YSNCueStateful.State:
 	if not cue._is_ephemeral():
 		_counter += 1

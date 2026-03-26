@@ -40,14 +40,21 @@ func emit_flow(flow: StringName) -> void:
 
 func _create_state() -> YSNCueStateful.State:
 	assert(cue is YSNCueStateful)
-	return instance._create_state(cue)
+	var state = instance._create_state(cue)
+	state._setup(self)
+	return state
 
 func _get_state() -> YSNCueStateful.State:
 	return instance._get_states(cue).front()
 
 func _get_or_create_state() -> YSNCueStateful.State:
 	assert(cue is YSNCueStateful)
-	return instance._get_or_create_state(cue)
+	var states := instance._get_states(cue)
+	if states.size() > 0:
+		if states.size() > 1:
+			push_warning()
+		return states.front()
+	return _create_state()
 
 func _remove_states() -> void:
 	for state in instance._get_states(cue):
