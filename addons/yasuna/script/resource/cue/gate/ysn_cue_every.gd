@@ -34,6 +34,9 @@ func _get_editor_title() -> StringName:
 func _get_editor_custom_action() -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'flows')
 
+func _get_editor_icon() -> Texture2D:
+	return load('res://addons/yasuna/editor/resource/icon/list-check.svg')
+
 
 class State extends YSNCueReactive.State:
 

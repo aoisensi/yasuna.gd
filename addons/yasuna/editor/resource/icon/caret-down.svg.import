@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dtuh53nfw57vw"
-path="res://.godot/imported/GuiSpinboxDown.svg-efeae78aa9f3a52a426d2f6bd03a298b.ctex"
+uid="uid://dye265qw3udpn"
+path="res://.godot/imported/caret-down.svg-93901a0d01d511a40ebe4a8619a12e4f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/yasuna/editor/icon/GuiSpinboxDown.svg"
-dest_files=["res://.godot/imported/GuiSpinboxDown.svg-efeae78aa9f3a52a426d2f6bd03a298b.ctex"]
+source_file="res://addons/yasuna/editor/resource/icon/caret-down.svg"
+dest_files=["res://.godot/imported/caret-down.svg-93901a0d01d511a40ebe4a8619a12e4f.ctex"]
 
 [params]
 
@@ -27,9 +27,9 @@ mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
-process/channel_remap/red=0
-process/channel_remap/green=1
-process/channel_remap/blue=2
+process/channel_remap/red=10
+process/channel_remap/green=10
+process/channel_remap/blue=10
 process/channel_remap/alpha=3
 process/fix_alpha_border=true
 process/premult_alpha=false
@@ -37,7 +37,7 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
-svg/scale=1.0
+detect_3d/compress_to=0
+svg/scale=0.667
 editor/scale_with_editor_scale=false
 editor/convert_colors_with_editor_theme=false

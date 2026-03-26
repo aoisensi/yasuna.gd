@@ -13,11 +13,14 @@ class_name YSNCueWait extends YSNCueAsync
 @export var ignore_time_scale := false
 
 
+func _get_state_class() -> Script:
+	return State
+
 func _get_editor_title() -> StringName:
 	return &'Wait'
 
-func _get_state_class() -> Script:
-	return State
+func _get_editor_icon() -> Texture2D:
+	return load('res://addons/yasuna/editor/resource/icon/clock.svg')
 
 func _get_editor_custom_body() -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_wait_body.gd').new(self)

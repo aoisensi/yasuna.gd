@@ -29,9 +29,6 @@ const EMIT_FLOW_PULSED = &'pulsed'
 @export var ignore_time_scale := false
 
 
-func _get_editor_title() -> StringName:
-	return &'Pulse'
-
 func _get_emit_flows() -> Array[StringName]:
 	return [EMIT_FLOW_PULSED]
 
@@ -45,6 +42,12 @@ func _get_state_class() -> Script:
 
 func _is_ephemeral() -> bool:
 	return false
+
+func _get_editor_title() -> StringName:
+	return &'Pulse'
+
+func _get_editor_icon() -> Texture2D:
+	return load('res://addons/yasuna/editor/resource/icon/bolt.svg')
 
 func _get_editor_custom_body() -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_pulse_body.gd').new(self)

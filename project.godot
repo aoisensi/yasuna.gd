@@ -18,6 +18,15 @@ config/icon="res://icon.svg"
 
 enabled=PackedStringArray("res://addons/yasuna/plugin.cfg")
 
+[importer_defaults]
+
+texture={
+&"detect_3d/compress_to": 0,
+&"process/channel_remap/blue": 10,
+&"process/channel_remap/green": 10,
+&"process/channel_remap/red": 10
+}
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

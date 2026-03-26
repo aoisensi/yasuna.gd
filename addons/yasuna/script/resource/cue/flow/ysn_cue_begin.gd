@@ -16,5 +16,8 @@ func _get_emit_flows() -> Array[StringName]:
 func _get_editor_title() -> StringName:
 	return &'Begin'
 
+func _get_editor_icon() -> Texture2D:
+	return load('res://addons/yasuna/editor/resource/icon/flag.svg')
+
 func _get_editor_node_color() -> Color:
 	return Color.RED

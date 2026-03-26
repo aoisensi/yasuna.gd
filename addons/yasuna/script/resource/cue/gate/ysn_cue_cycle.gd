@@ -29,6 +29,9 @@ func _get_state_class() -> Script:
 func _get_editor_title() -> StringName:
 	return &'Cycle'
 
+func _get_editor_icon() -> Texture2D:
+	return load('res://addons/yasuna/editor/resource/icon/analyze.svg')
+
 func _get_editor_custom_action() -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'count')
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dks66t0kxgicv"
-path="res://.godot/imported/GuiSpinboxUp.svg-4afc923343eee4568164011af54654b3.ctex"
+uid="uid://jncikvaptpm5"
+path="res://.godot/imported/list-check.svg-f64521463d73626bc0708dc8536acde0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/yasuna/editor/icon/GuiSpinboxUp.svg"
-dest_files=["res://.godot/imported/GuiSpinboxUp.svg-4afc923343eee4568164011af54654b3.ctex"]
+source_file="res://addons/yasuna/editor/resource/icon/list-check.svg"
+dest_files=["res://.godot/imported/list-check.svg-f64521463d73626bc0708dc8536acde0.ctex"]
 
 [params]
 
@@ -27,9 +27,9 @@ mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
-process/channel_remap/red=0
-process/channel_remap/green=1
-process/channel_remap/blue=2
+process/channel_remap/red=10
+process/channel_remap/green=10
+process/channel_remap/blue=10
 process/channel_remap/alpha=3
 process/fix_alpha_border=true
 process/premult_alpha=false
@@ -37,7 +37,7 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
-svg/scale=1.0
+detect_3d/compress_to=0
+svg/scale=0.667
 editor/scale_with_editor_scale=false
 editor/convert_colors_with_editor_theme=false

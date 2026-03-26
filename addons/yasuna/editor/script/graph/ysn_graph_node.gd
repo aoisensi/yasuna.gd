@@ -12,6 +12,7 @@ var _slots_node: Array[Control] = []
 var _receive_flows: Array[StringName] = []
 var _emit_flows: Array[StringName] = []
 
+var _icon: TextureButton
 
 func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int) -> void:
 	_editor = editor
@@ -21,10 +22,18 @@ func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int) -> void:
 	dragged.connect(_on_dragged)
 	cue.script_changed.connect(_on_cue_script_changed.call_deferred)
 	resize_request.connect(_on_resize_request)
+	EditorInterface.get_editor_theme().changed.connect(_on_editor_theme_changed)
+
+	_icon = TextureButton.new()
+	_icon.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	var titlebar := get_titlebar_hbox()
+	titlebar.add_child(_icon)
+	titlebar.move_child(_icon, 0)
 
 func _ready() -> void:
 	_on_cue_changed()
 	_on_cue_script_changed()
+	_on_editor_theme_changed()
 
 func _on_cue_changed() -> void:
 	title = _cue._get_editor_title()
@@ -37,9 +46,14 @@ func _on_cue_changed() -> void:
 func _on_cue_script_changed() -> void:
 	_custom_body = _cue._get_editor_custom_body()
 	_custom_action = _cue._get_editor_custom_action()
+	_icon.texture_normal = _cue._get_editor_icon()
 
 func _on_dragged(from: Vector2, to: Vector2) -> void:
 	_editor.scenario.set_cue_position(_id, to)
+
+func _on_editor_theme_changed() -> void:
+	var theme := EditorInterface.get_editor_theme()
+	_icon.modulate = theme.get_color(&'font_color', &'Label')
 
 func _check_flows() -> void:
 	var receive_flows := _cue._get_receive_flows()
