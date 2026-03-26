@@ -1,19 +1,34 @@
 @tool
 extends EditorDock
 
+const _YSNGraphList := preload('./ysn_graph_list.gd')
 const _YSNGraphEdit := preload('./ysn_graph_edit.gd')
 
+var _split: HSplitContainer
+
+var _graph_list: _YSNGraphList
 var _graph_edit: _YSNGraphEdit
 
 
 func _init() -> void:
-	pass
+	_split = HSplitContainer.new()
+	_graph_list = _YSNGraphList.new()
+	_graph_list.custom_minimum_size = Vector2(240.0, 0.0)
+	_split.add_child(_graph_list)
+	add_child(_split)
+	_graph_list.scenario_activated.connect(_on_graph_list_scenario_activated)
 
 func edit(scenario: YSNScenario) -> void:
-	if scenario:
-		if _graph_edit:
-			remove_child(_graph_edit)
-			_graph_edit.queue_free()
+	_graph_list.add(scenario)
 
-		_graph_edit = _YSNGraphEdit.new(scenario)
-		add_child(_graph_edit)
+func _on_graph_list_scenario_activated(scenario: YSNScenario) -> void:
+	if not scenario:
+		return
+	if _graph_edit:
+		_split.remove_child(_graph_edit)
+		_graph_edit.queue_free()
+
+	_graph_edit = _YSNGraphEdit.new(scenario)
+	_split.add_child(_graph_edit)
+	_split.move_child(_graph_edit, 1)
+
