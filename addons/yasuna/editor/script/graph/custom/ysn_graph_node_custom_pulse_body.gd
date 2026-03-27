@@ -2,7 +2,6 @@
 extends VBoxContainer
 
 var _cue: YSNCuePulse
-var _count_spinner: EditorSpinSlider
 var _wait_spinner: EditorSpinSlider
 
 
@@ -11,15 +10,6 @@ func _init(cue: YSNCuePulse) -> void:
 	_cue.changed.connect(_on_cue_changed)
 
 	custom_minimum_size = Vector2(240.0, 0.0)
-	
-	_count_spinner = EditorSpinSlider.new()
-	_count_spinner.allow_greater = true
-	_count_spinner.min_value = -1
-	_count_spinner.max_value = 100
-	_count_spinner.editing_integer = true
-	_count_spinner.suffix = ' times'
-	_count_spinner.value_changed.connect(_on_count_spinner_changed)
-	add_child(_count_spinner)
 
 	_wait_spinner = EditorSpinSlider.new()
 	_wait_spinner.allow_greater = true
@@ -33,14 +23,9 @@ func _init(cue: YSNCuePulse) -> void:
 func _ready() -> void:
 	_on_cue_changed()
 
-func _on_count_spinner_changed(value: float) -> void:
-	_cue.count = value
-
 func _on_wait_spinner_changed(value: float) -> void:
 	_cue.time_sec = value
 
 func _on_cue_changed() -> void:
-	if _count_spinner.value != _cue.count:
-		_count_spinner.value = _cue.count
 	if _wait_spinner.value != _cue.time_sec:
 		_wait_spinner.value = _cue.time_sec
