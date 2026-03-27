@@ -49,6 +49,7 @@ func _on_cue_script_changed() -> void:
 	_icon.texture_normal = _cue._get_editor_icon()
 
 func _on_dragged(from: Vector2, to: Vector2) -> void:
+	# TODO: support UndoRedo
 	_editor.scenario.set_cue_position(_id, to)
 
 func _on_editor_theme_changed() -> void:

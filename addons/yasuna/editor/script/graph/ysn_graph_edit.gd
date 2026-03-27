@@ -12,6 +12,8 @@ var scenario: YSNScenario:
 
 var _cue_nodes: Dictionary[int, _YSNGraphNode] = {}
 
+var _undo_redo := EditorInterface.get_editor_undo_redo()
+
 
 func _init(scenario: YSNScenario) -> void:
 	_scenario = scenario
@@ -54,7 +56,7 @@ func _create_cue_node(id: int) -> _YSNGraphNode:
 	var cue := scenario.get_cue(id)
 	var node := _YSNGraphNode.new(self, cue, id)
 	add_child(node)
-	node.name = YSNScenario._get_editor_node_name(id)
+	node.name = str(id)
 	_cue_nodes[id] = node
 	return node
 
@@ -72,16 +74,22 @@ func _on_connection_request(from_node: StringName, from_port: int, to_node: Stri
 	var receiver_id := _cue_nodes.find_key(to)
 	var receive_flow := to._cue._get_receive_flows()[to_port]
 	if is_connect:
-		var error := scenario.connect_cues(emitter_id, emit_flow, receiver_id, receive_flow)
-		if error:
-			push_error(error_string(error))
+		_undo_redo.create_action('Connect Cue Node')
+		_connect_nodes(emitter_id, emit_flow, receiver_id, receive_flow)
+		_undo_redo.commit_action()
 	else:
-		scenario.disconnect_cues(emitter_id, emit_flow, receiver_id, receive_flow)
+		_undo_redo.create_action('Disonnect Cue Node')
+		_disconnect_nodes(emitter_id, emit_flow, receiver_id, receive_flow)
+		_undo_redo.commit_action()
 
 func _on_delete_node_request(names: Array[StringName]) -> void:
+	_undo_redo.create_action('Delete Scenario Cues', UndoRedo.MERGE_DISABLE, null, true)
+	var ids := PackedInt32Array()
 	for name in names:
 		var node := get_node(String(name)) as _YSNGraphNode
-		scenario.remove_cue(node._id)
+		ids.append(node._id)
+	_delete_nodes(ids)
+	_undo_redo.commit_action()
 
 func _on_node_selected(node: Node) -> void:
 	if node is _YSNGraphNode:
@@ -93,3 +101,42 @@ func _on_popup_request(at_position: Vector2) -> void:
 	add_child(popup)
 	popup.popup_on_parent(Rect2(at_position + global_position, Vector2.ZERO))
 	popup.spawn_position = at_position + scroll_offset
+
+func _create_cue(script: Script, position := Vector2.ZERO) -> void:
+	var cue_id := scenario.get_valid_cue_id()
+	var cue := script.new() as YSNCue
+	_undo_redo.create_action('Create YSNScenario Cue')
+	_undo_redo.add_do_method(scenario, &'add_cue', cue, cue_id, position)
+	_undo_redo.add_undo_method(scenario, &'remove_cue', cue_id)
+	_undo_redo.commit_action()
+
+func _delete_nodes(ids: PackedInt32Array) -> void:
+	var connections := scenario.get_cue_connections()
+	for connection in connections:
+		for id in ids:
+			var emitter_id: int = connection.from_node.to_int()
+			var receiver_id: int = connection.to_node.to_int()
+			if emitter_id == id or receiver_id == id:
+				var emitter := scenario.get_cue(emitter_id)
+				var receiver := scenario.get_cue(receiver_id)
+				var emit_flow := emitter._get_emit_flows()[connection.from_port]
+				var receive_flow := receiver._get_receive_flows()[connection.to_port]
+				_disconnect_nodes(emitter_id, emit_flow, receiver_id, receive_flow)
+
+	for id in ids:
+		var node := _cue_nodes[id]
+		remove_child(node)
+		node.queue_free()
+		_cue_nodes.erase(id)
+		var cue := scenario.get_cue(id)
+		var position := scenario.get_cue_position(id)
+		_undo_redo.add_do_method(scenario, &'remove_cue', id)
+		_undo_redo.add_undo_method(scenario, &'add_cue', cue, id, position)
+
+func _connect_nodes(emitter_id: int, emit_flow: StringName, receiver_id: int, receive_flow: StringName) -> void:
+	_undo_redo.add_do_method(scenario, &'connect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
+	_undo_redo.add_undo_method(scenario, &'disconnect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
+
+func _disconnect_nodes(emitter_id: int, emit_flow: StringName, receiver_id: int, receive_flow: StringName) -> void:
+	_undo_redo.add_do_method(scenario, &'disconnect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
+	_undo_redo.add_undo_method(scenario, &'connect_cues', emitter_id, emit_flow, receiver_id, receive_flow)

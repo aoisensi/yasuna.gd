@@ -94,9 +94,9 @@ func get_cue_connections() -> Array[Dictionary]:
 					if to_port < 0:
 						continue
 					result.append({
-						from_node = _get_editor_node_name(emitter_id),
+						from_node = StringName(str(emitter_id)),
 						from_port = from_port,
-						to_node = _get_editor_node_name(receiver_id),
+						to_node = StringName(str(receiver_id)),
 						to_port = to_port,
 						keep_alive = false,
 					})
@@ -123,20 +123,30 @@ func get_cue_position(id: int) -> Vector2:
 func get_cue_size(id: int) -> Vector2:
 	return _get_cue_data(id).get(&'size', Vector2.ZERO)
 
-func get_valid_cue_id() -> int:
+func get_valid_cue_id() -> int: # maybe bad code
+	if _cues.is_empty():
+		return 1
 	var ids := _cues.keys()
-	return ids.back() + 1 if ids else 1
+	var id := ids.back()
+	while _cues.has(id):
+		id += 1
+	return id
 
-func remove_cue(id: int) -> void:
-	_cues.erase(id)
-	for cue in _cues:
-		var data := _get_cue_data(cue)
+func remove_cue(id: int) -> bool:
+	if not _cues.has(id):
+		return false
+	for cue_id in _cues:
+		var data := _get_cue_data(cue_id)
 		var connections := data.get(&'connections')
 		if not connections:
 			continue
 		for emitter in connections:
 			connections[emitter].erase(id)
+	var cue := get_cue(id)
+	cue.changed.disconnect(_on_cue_changed.bind(id))
+	_cues.erase(id)
 	emit_changed()
+	return true
 
 func set_cue_position(id: int, position := Vector2.ZERO) -> void:
 	_get_cue_data(id)[&'position'] = position
@@ -185,5 +195,3 @@ func _get_cue_data(id: int) -> Dictionary:
 	assert(data)
 	return data
 
-static func _get_editor_node_name(id: int) -> StringName:
-	return StringName('Cue_%d' % id)
