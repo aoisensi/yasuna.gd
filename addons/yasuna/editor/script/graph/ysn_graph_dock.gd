@@ -10,6 +10,9 @@ var _graph_list: _YSNGraphList
 var _graph_edit: _YSNGraphEdit
 
 
+func save() -> void:
+	_graph_edit.save()
+
 func _init() -> void:
 	_split = HSplitContainer.new()
 	_graph_list = _YSNGraphList.new()
@@ -26,6 +29,7 @@ func _on_graph_list_scenario_activated(scenario: YSNScenario) -> void:
 		return
 	if _graph_edit:
 		_split.remove_child(_graph_edit)
+		_graph_edit.save()
 		_graph_edit.queue_free()
 
 	_graph_edit = _YSNGraphEdit.new(scenario)

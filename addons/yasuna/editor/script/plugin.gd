@@ -25,6 +25,9 @@ func _exit_tree() -> void:
 	_graph_dock.queue_free()
 	_graph_dock = null
 
+func _apply_changes() -> void:
+	_graph_dock.save()
+
 func _handles(object: Object) -> bool:
 	return object is YSNScenario
 

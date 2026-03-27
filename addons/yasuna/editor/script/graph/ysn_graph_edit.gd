@@ -30,9 +30,10 @@ func _init(scenario: YSNScenario) -> void:
 func _ready() -> void:
 	_on_scenario_changed()
 
-func _exit_tree() -> void:
+func save() -> void:
 	if scenario.resource_path:
 		ResourceSaver.save(scenario)
+		scenario.emit_changed()
 
 func _on_scenario_changed() -> void:
 	var cue_list := scenario.get_cue_list()
@@ -76,11 +77,10 @@ func _on_connection_request(from_node: StringName, from_port: int, to_node: Stri
 	if is_connect:
 		_undo_redo.create_action('Connect Cue Node')
 		_connect_nodes(emitter_id, emit_flow, receiver_id, receive_flow)
-		_undo_redo.commit_action()
 	else:
 		_undo_redo.create_action('Disonnect Cue Node')
 		_disconnect_nodes(emitter_id, emit_flow, receiver_id, receive_flow)
-		_undo_redo.commit_action()
+	_undo_redo.commit_action()
 
 func _on_delete_node_request(names: Array[StringName]) -> void:
 	_undo_redo.create_action('Delete Scenario Cues', UndoRedo.MERGE_DISABLE, null, true)
