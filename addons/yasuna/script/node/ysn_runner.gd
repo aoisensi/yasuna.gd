@@ -4,7 +4,7 @@ class_name YSNRunner extends Node
 
 var instances: Array[YSNInstance] = []
 
-signal instance_released(scenario: YSNScenario)
+signal finished(scenario: YSNScenario)
 
 
 func _ready() -> void:
@@ -13,15 +13,16 @@ func _ready() -> void:
 			if scenario:
 				act(scenario)
 
-func act(scenario: YSNScenario) -> void:
+func act(scenario: YSNScenario) -> YSNInstance:
 	var instance := YSNInstance.new()
 	instance._runner = self
 	instance._scenario = scenario
 	instances.append(instance)
 	instance._queue_emit(1, &'')
 	instance._run()
+	return instance
 
-func _release_instance(instance: YSNInstance) -> void:
+func _finish_instance(instance: YSNInstance) -> void:
 	var scenario = instance.scenario
 	instances.erase(instance)
-	instance_released.emit(scenario)
+	finished.emit(scenario)

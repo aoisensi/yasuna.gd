@@ -18,7 +18,13 @@ var scenario: YSNScenario:
 
 var _queue: Array[Dictionary] = []
 var _running := false
-var is_released := false
+var _is_finished := false
+var is_finished := false:
+	get:
+		return is_finished
+
+signal finished
+
 
 func _get_states(cue: YSNCueStateful) -> Array[YSNCueStateful.State]:
 	var result: Array[YSNCueStateful.State] = []
@@ -55,7 +61,7 @@ func _add_state(state: YSNCueStateful.State) -> void:
 	_states.get_or_add(state.cue, []).append(state)
 
 func _run() -> void:
-	if is_released:
+	if is_finished:
 		push_warning()
 
 	if _running:
@@ -81,8 +87,11 @@ func _queue_emit(cue_id: int, emit_flow: StringName) -> void:
 
 func _check_alive() -> void:
 	if _counter == 0 and not _running:
-		_release()
+		_finish()
 
-func _release() -> void:
-	is_released = true
-	runner._release_instance(self)
+func _finish() -> void:
+	if is_finished:
+		return
+	is_finished = true
+	runner._finish_instance(self)
+	finished.emit()
