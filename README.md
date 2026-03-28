@@ -1,6 +1,10 @@
 # yasuna.gd
 -----
-Graph based scenario plugin for Godot 4
+Graph based stateful scenario plugin for Godot 4
 
-## Credits
-Editor icons from [tabler-icons](https://tabler.io/icons).
+## License
+
+This addon is licensed under the MIT License. 
+
+## Third-Party Assets
+- **[Editor icons](assets/yasuna/editor/resource/icon/)** from [tabler-icons](https://tabler.io/icons) by _Paweł Kuna_ licensed under the MIT-License.
