@@ -1,13 +1,21 @@
 class_name YSNInstance extends Resource
 
+
 var _runner: YSNRunner
 var runner: YSNRunner:
 	get:
 		return _runner
+
+@export var _sid: int
+var sid: int:
+	get:
+		return _sid
+
 @export var _scenario: YSNScenario
 var scenario: YSNScenario:
 	get:
 		return _scenario
+
 @export var _states: Dictionary[YSNCueStateful, Array] = {}
 @export var _counter: int = 0:
 	set(value):
@@ -25,6 +33,11 @@ var is_finished := false:
 
 signal finished
 
+
+func _init(sid: int, runner: YSNRunner, scenario: YSNScenario) -> void:
+	_sid = sid
+	_runner = runner
+	_scenario = scenario
 
 func _get_states(cue: YSNCueStateful) -> Array[YSNCueStateful.State]:
 	var result: Array[YSNCueStateful.State] = []
@@ -63,6 +76,7 @@ func _add_state(state: YSNCueStateful.State) -> void:
 func _run() -> void:
 	if is_finished:
 		push_warning()
+		return
 
 	if _running:
 		return
