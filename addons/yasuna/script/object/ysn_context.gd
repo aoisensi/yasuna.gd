@@ -34,6 +34,9 @@ func _init(instance: YSNInstance, id: int, flow: StringName) -> void:
 	_flow = flow
 
 func emit_flow(flow: StringName) -> void:
+	if EngineDebugger.is_active():
+		EngineDebugger.send_message('yasuna:cue_flow_emitted', [instance.get_instance_id(), id, flow])
+
 	for connected in scenario.get_connected_cues(id, flow):
 		instance._queue_emit(connected.cue, connected.flow)
 	instance._run()

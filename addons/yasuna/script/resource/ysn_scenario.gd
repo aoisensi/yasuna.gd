@@ -101,7 +101,7 @@ func get_cue_connections() -> Array[Dictionary]:
 						keep_alive = false,
 					})
 	return result
-
+## [code][{ cue: int, flow: StringName }][/code]
 func get_connected_cues(emitter_id: int, emit_flow: StringName) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var data = _get_cue_data(emitter_id)

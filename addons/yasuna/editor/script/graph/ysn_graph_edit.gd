@@ -14,16 +14,22 @@ var _cue_nodes: Dictionary[int, _YSNGraphNode] = {}
 
 var _undo_redo := EditorInterface.get_editor_undo_redo()
 
+var _debugger: Object
 
-func _init(scenario: YSNScenario) -> void:
+func _init(scenario: YSNScenario, debugger: Object = null) -> void:
 	_scenario = scenario
-	
-	right_disconnects = true
+	_debugger = debugger
 
-	popup_request.connect(_on_popup_request)
-	delete_nodes_request.connect(_on_delete_node_request)
-	connection_request.connect(_on_connection_request.bind(true))
-	disconnection_request.connect(_on_connection_request.bind(false))
+	if not debugger:
+		right_disconnects = true
+
+		popup_request.connect(_on_popup_request)
+		delete_nodes_request.connect(_on_delete_node_request)
+		connection_request.connect(_on_connection_request.bind(true))
+		disconnection_request.connect(_on_connection_request.bind(false))
+	else:
+		debugger.connect(&'flow_emitted', _on_debugger_flow_emitted)
+
 	node_selected.connect(_on_node_selected)
 	_scenario.changed.connect(_on_scenario_changed)
 
@@ -56,6 +62,8 @@ func _get_cue_node(id: int) -> _YSNGraphNode:
 func _create_cue_node(id: int) -> _YSNGraphNode:
 	var cue := scenario.get_cue(id)
 	var node := _YSNGraphNode.new(self, cue, id)
+	if _debugger:
+		node.draggable = false
 	add_child(node)
 	node.name = str(id)
 	_cue_nodes[id] = node
@@ -140,3 +148,24 @@ func _connect_nodes(emitter_id: int, emit_flow: StringName, receiver_id: int, re
 func _disconnect_nodes(emitter_id: int, emit_flow: StringName, receiver_id: int, receive_flow: StringName) -> void:
 	_undo_redo.add_do_method(scenario, &'disconnect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
 	_undo_redo.add_undo_method(scenario, &'connect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
+
+func _on_debugger_flow_emitted(cue_id: int, emit_flow: StringName) -> void:
+	var tween := create_tween()
+	tween.tween_method(_change_node_flow_color.bind(cue_id, emit_flow), Color.GREEN, Color.WHITE, 0.25)
+	tween.play()
+
+func _change_node_flow_color(color: Color, cue_id: int, emit_flow: StringName) -> void:
+	var node := _cue_nodes[cue_id]
+	var cue := node._cue
+	var slot := cue._get_emit_flows().find(emit_flow)
+	if slot < 0:
+		return
+	node.set_slot_color_right(slot, color)
+	var connection := scenario.get_connected_cues(cue_id, emit_flow)
+	for c in connection:
+		var cnode := _cue_nodes[c.cue]
+		var ccue := cnode._cue
+		var cslot := ccue._get_receive_flows().find(c.flow)
+		if cslot < 0:
+			continue
+		cnode.set_slot_color_left(cslot, color)
