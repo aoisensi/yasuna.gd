@@ -28,5 +28,8 @@ class State extends Resource:
 	@abstract
 	func _received(context: YSNContext) -> void
 
+	func _pre_captured() -> void:
+		pass
+
 	func _destroy(context: YSNContext) -> void:
 		pass

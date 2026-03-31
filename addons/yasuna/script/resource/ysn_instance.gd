@@ -34,7 +34,7 @@ var is_finished := false:
 signal finished
 
 
-func _init(sid: int, runner: YSNRunner, scenario: YSNScenario) -> void:
+func _set_initialize(sid: int, runner: YSNRunner, scenario: YSNScenario) -> void:
 	_sid = sid
 	_runner = runner
 	_scenario = scenario
@@ -109,3 +109,9 @@ func _finish() -> void:
 	is_finished = true
 	runner._finish_instance(self)
 	finished.emit()
+
+func _capture() -> YSNInstance:
+	for states in _states.values():
+		for state in states:
+			(state as YSNCueStateful.State)._pre_captured()
+	return duplicate_deep(DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)

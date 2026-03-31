@@ -44,6 +44,8 @@ func _get_editor_custom_body() -> Control:
 
 class State extends YSNCueReactive.State:
 	
+	@export var elapsed_sec: float
+
 	var _timer: Timer
 
 	func _evaluate(context: YSNContext) -> void:
@@ -71,3 +73,9 @@ class State extends YSNCueReactive.State:
 			context.runner.remove_child(_timer)
 			_timer.queue_free()
 			_timer = null
+
+	func _pre_captured() -> void:
+		if _timer:
+			elapsed_sec = (cue as YSNCuePulse).time_sec - _timer.time_left
+		else:
+			elapsed_sec = -1.0

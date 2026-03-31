@@ -36,7 +36,7 @@ func _get_number_flows(n: int) -> Array[StringName]:
 
 @abstract
 class State extends YSNCueStateful.State:
-	
+
 	func _received(context: YSNContext) -> void:
 		_evaluate(context)
 

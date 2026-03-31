@@ -23,13 +23,24 @@ func _ready() -> void:
 
 func act(scenario: YSNScenario) -> YSNInstance:
 	var sid := _get_valid_sid()
-	var instance := YSNInstance.new(sid, self, scenario)
+	var instance := YSNInstance.new()
+	instance._set_initialize(sid, self, scenario)
 	_instances[sid] = instance
 	instance._queue_emit(1, &'') # TODO: better begin finding
 	instance._run()
 	if EngineDebugger.is_active():
 		EngineDebugger.send_message('yasuna:instance_started', [instance.get_instance_id(), get_instance_id(), scenario.resource_path])
 	return instance
+
+func capture() -> YSNCapture:
+	var result := YSNCapture.new()
+	for sid in _instances:
+		var instance := _instances[sid]
+		result.instances[sid] = instance._capture()
+	return result
+
+func restore(capture: YSNCapture) -> void:
+	pass
 
 func _finish_instance(instance: YSNInstance) -> void:
 	var scenario = instance.scenario
