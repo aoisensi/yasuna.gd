@@ -50,6 +50,6 @@ class State extends YSNCueAsync.State:
 		var time_sec := cue._get_time_sec()
 		return tree.create_timer(time_sec, cue.process_always, cue.process_in_physics, cue.ignore_time_scale)
 
-	func _pre_captured() -> void:
+	func _capturing() -> void:
 		if _timer:
 			time_left = _timer.time_left

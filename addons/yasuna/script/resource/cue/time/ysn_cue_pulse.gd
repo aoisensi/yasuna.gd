@@ -74,6 +74,6 @@ class State extends YSNCueReactive.State:
 			_timer.queue_free()
 			_timer = null
 
-	func _pre_captured() -> void:
+	func _capturing() -> void:
 		if _timer:
 			time_left = _timer.time_left

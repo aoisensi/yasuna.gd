@@ -115,7 +115,7 @@ func _finish() -> void:
 func _capture() -> YSNInstance:
 	for states in _states.values():
 		for state in states:
-			(state as YSNCueStateful.State)._pre_captured()
+			(state as YSNCueStateful.State)._capturing()
 	return duplicate_deep(DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
 
 func _abort() -> void:
