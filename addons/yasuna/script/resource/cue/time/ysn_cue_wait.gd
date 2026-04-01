@@ -13,6 +13,9 @@ class_name YSNCueWait extends YSNCueAsync
 @export var ignore_time_scale := false
 
 
+func _get_time_sec() -> float:
+	return time_sec
+
 func _get_state_class() -> Script:
 	return State
 
@@ -28,22 +31,25 @@ func _get_editor_custom_body() -> Control:
 
 class State extends YSNCueAsync.State:
 
-	@export var elapsed_sec: float
+	@export var time_left: float:
+		set(value):
+			time_left = max(0.0, value)
+		get:
+			return time_left
 
 	var _timer: SceneTreeTimer
 
 	func _perfome(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueWait
-		_create_timer(context, cue.time_sec)
+		_timer = _create_timer(context)
 		await _timer.timeout
 
-	func _create_timer(context: YSNContext, time_sec: float) -> void:
+	func _create_timer(context: YSNContext) -> SceneTreeTimer:
 		var cue := context.cue as YSNCueWait
 		var tree := context.runner.get_tree()
-		_timer = tree.create_timer(time_sec, cue.process_always, cue.process_in_physics, cue.ignore_time_scale)
+		var time_sec := cue._get_time_sec()
+		return tree.create_timer(time_sec, cue.process_always, cue.process_in_physics, cue.ignore_time_scale)
 
 	func _pre_captured() -> void:
 		if _timer:
-			elapsed_sec = (cue as YSNCueWait).time_sec - _timer.time_left
-		else:
-			elapsed_sec = -1.0
+			time_left = _timer.time_left

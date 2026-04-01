@@ -44,7 +44,7 @@ func _get_editor_custom_body() -> Control:
 
 class State extends YSNCueReactive.State:
 	
-	@export var elapsed_sec: float
+	@export var time_left: float
 
 	var _timer: Timer
 
@@ -76,6 +76,4 @@ class State extends YSNCueReactive.State:
 
 	func _pre_captured() -> void:
 		if _timer:
-			elapsed_sec = (cue as YSNCuePulse).time_sec - _timer.time_left
-		else:
-			elapsed_sec = -1.0
+			time_left = _timer.time_left
