@@ -63,14 +63,14 @@ class State extends YSNCueReactive.State:
 				_timer.timeout.connect(_pulsed.bind(context))
 				_timer.start()
 			RECEIVE_FLOW_RESET:
-				_destroy(context)
-			
+				_destroy()
+
 	func _pulsed(context: YSNContext) -> void:
 		context.emit_flow(EMIT_FLOW_PULSED)
 
-	func _destroy(context: YSNContext) -> void:
+	func _destroy() -> void:
 		if _timer:
-			context.runner.remove_child(_timer)
+			_timer.get_parent().remove_child(_timer)
 			_timer.queue_free()
 			_timer = null
 

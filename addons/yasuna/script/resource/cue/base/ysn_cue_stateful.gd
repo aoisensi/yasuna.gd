@@ -31,5 +31,5 @@ class State extends Resource:
 	func _pre_captured() -> void:
 		pass
 
-	func _destroy(context: YSNContext) -> void:
+	func _destroy() -> void:
 		pass

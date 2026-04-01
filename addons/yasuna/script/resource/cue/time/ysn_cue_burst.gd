@@ -70,10 +70,11 @@ class State extends YSNCueAsync.State:
 				return
 			await _timer.timeout
 
-	func _destroy(context: YSNContext) -> void:
+	func _destroy() -> void:
 		if _timer:
-			context.runner.remove_child(_timer)
+			_timer.get_parent().remove_child(_timer)
 			_timer.queue_free()
+			_timer = null
 
 	func _pre_captured() -> void:
 		if _timer:

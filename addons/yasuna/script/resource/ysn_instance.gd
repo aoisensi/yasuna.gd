@@ -24,10 +24,12 @@ var scenario: YSNScenario:
 	get:
 		return _counter
 
+@export var _is_canceled := false
+
 var _queue: Array[Dictionary] = []
 var _running := false
 var _is_finished := false
-var is_finished := false:
+var is_finished: bool:
 	get:
 		return is_finished
 
@@ -115,3 +117,12 @@ func _capture() -> YSNInstance:
 		for state in states:
 			(state as YSNCueStateful.State)._pre_captured()
 	return duplicate_deep(DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
+
+func _abort() -> void:
+	_is_canceled = true
+
+	for states in _states.values():
+		for state in states:
+			state._destroy()
+
+	runner._finish_instance(self)
