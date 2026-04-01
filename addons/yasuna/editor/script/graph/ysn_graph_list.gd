@@ -6,6 +6,9 @@ var _root: TreeItem
 
 signal scenario_activated(scenario: YSNScenario)
 
+const _COLUMN_TITLE = 0
+const _COLUMN_PATH = 1
+
 
 func _init() -> void:
 	_root = create_item()
@@ -37,10 +40,9 @@ func _on_scenario_changed(scenario: YSNScenario) -> void:
 	var item: TreeItem = _items.get(scenario)
 	if not item:
 		return
-	var text := ''
-	if scenario.resource_path:
-		text += scenario.resource_path
-	else:
-		text += '<UNSAVED>'
 
-	item.set_text(0, text)
+	var title := scenario.title
+	if title.is_empty():
+		title = scenario.resource_path.get_file()
+
+	item.set_text(_COLUMN_TITLE, title)

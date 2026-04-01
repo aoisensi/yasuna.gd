@@ -1,6 +1,13 @@
 @tool
 class_name YSNScenario extends Resource
 
+@export var title: String = '':
+	set(value):
+		if title != value:
+			title = value
+			emit_changed()
+	get:
+		return title
 
 @export_storage
 var _cues: Dictionary = {

@@ -10,6 +10,8 @@ var scenario: YSNScenario:
 	get:
 		return _scenario
 
+var _title: LineEdit
+
 var _cue_nodes: Dictionary[int, _YSNGraphNode] = {}
 
 var _undo_redo := EditorInterface.get_editor_undo_redo()
@@ -33,6 +35,8 @@ func _init(scenario: YSNScenario, debugger: Object = null) -> void:
 	node_selected.connect(_on_node_selected)
 	_scenario.changed.connect(_on_scenario_changed)
 
+	_setup_toolbox(debugger)
+
 func _ready() -> void:
 	_on_scenario_changed()
 
@@ -55,6 +59,9 @@ func _on_scenario_changed() -> void:
 	for id in ids:
 		_remove_cue_node(id)
 	connections = scenario.get_cue_connections()
+
+	if not _title.is_editing():
+		_title.text = scenario.title
 
 func _get_cue_node(id: int) -> _YSNGraphNode:
 	return _cue_nodes.get(id)
@@ -109,6 +116,16 @@ func _on_popup_request(at_position: Vector2) -> void:
 	add_child(popup)
 	popup.popup_on_parent(Rect2(at_position + global_position, Vector2.ZERO))
 	popup.spawn_position = at_position + scroll_offset
+
+func _setup_toolbox(debugger: Object) -> void:
+	var hbox := get_menu_hbox()
+	_title = LineEdit.new()
+	_title.editable = not debugger
+	_title.custom_minimum_size = Vector2(240.0, 0.0)
+	_title.placeholder_text = 'Title'
+	_title.text_changed.connect(_on_title_text_changed)
+	hbox.add_child(_title)
+	hbox.move_child(_title, 0)
 
 func _create_cue(script: Script, position := Vector2.ZERO) -> void:
 	var cue_id := scenario.get_valid_cue_id()
@@ -169,3 +186,10 @@ func _change_node_flow_color(color: Color, cue_id: int, emit_flow: StringName) -
 		if cslot < 0:
 			continue
 		cnode.set_slot_color_left(cslot, color)
+
+func _on_title_text_changed(new_text: String) -> void:
+	var old_text := scenario.title
+	_undo_redo.create_action('Change Scenario Title', UndoRedo.MERGE_ENDS)
+	_undo_redo.add_do_property(scenario, &'title', new_text)
+	_undo_redo.add_undo_property(scenario, &'title', old_text)
+	_undo_redo.commit_action()
