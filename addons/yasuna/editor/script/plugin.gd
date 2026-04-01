@@ -18,6 +18,7 @@ func _disable_plugin() -> void:
 
 func _enter_tree() -> void:
 	_graph_dock = _YSNGraphDock.new()
+	resource_saved.connect(_graph_dock._on_plugin_resource_saved)
 	_graph_dock.default_slot = EditorDock.DOCK_SLOT_BOTTOM
 	_graph_dock.title = 'Yasuna'
 	add_dock(_graph_dock)

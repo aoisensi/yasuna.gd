@@ -36,3 +36,6 @@ func _on_graph_list_scenario_activated(scenario: YSNScenario) -> void:
 	_split.add_child(_graph_edit)
 	_split.move_child(_graph_edit, 1)
 
+func _on_plugin_resource_saved(resource: Resource) -> void:
+	if resource is YSNScenario:
+		_graph_list._on_scenario_changed(resource)

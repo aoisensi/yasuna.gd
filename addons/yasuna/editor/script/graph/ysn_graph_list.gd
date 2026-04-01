@@ -41,6 +41,6 @@ func _on_scenario_changed(scenario: YSNScenario) -> void:
 	if scenario.resource_path:
 		text += scenario.resource_path
 	else:
-		text += scenario.resource_name
+		text += '<UNSAVED>'
 
 	item.set_text(0, text)
