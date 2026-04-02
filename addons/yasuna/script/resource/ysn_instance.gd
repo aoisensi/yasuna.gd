@@ -88,6 +88,7 @@ func _run() -> void:
 		var next := _queue.pop_front()
 		var cue_id: int = next.cue
 		var cue := scenario.get_cue(cue_id)
+		assert(cue)
 		var flow: StringName = next.flow
 		var context := YSNContext.new(self, cue_id, flow)
 		cue._received(context)
@@ -100,6 +101,15 @@ func _queue_emit(cue_id: int, emit_flow: StringName) -> void:
 		cue = cue_id,
 		flow = emit_flow,
 	})
+
+func _begin(begin_name: StringName) -> void:
+	assert(begin_name)
+	var id := scenario.get_begin_cue(begin_name)
+	if id <= 0:
+		push_error()
+		return
+	_queue_emit(id, &'')
+	_run()
 
 func _check_alive() -> void:
 	if _counter == 0 and not _running:

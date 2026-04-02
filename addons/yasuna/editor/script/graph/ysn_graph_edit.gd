@@ -124,7 +124,9 @@ func _setup_toolbox(debugger: Object) -> void:
 	_title.editable = not debugger
 	_title.custom_minimum_size = Vector2(240.0, 0.0)
 	_title.placeholder_text = 'Title'
-	_title.text_changed.connect(_on_title_text_changed)
+	_title.focus_exited.connect(_on_title_focus_exited)
+	_title.keep_editing_on_text_submit = true
+	_title.text_submitted.connect(_on_title_text_submitted)
 	hbox.add_child(_title)
 	hbox.move_child(_title, 0)
 
@@ -188,9 +190,12 @@ func _change_node_flow_color(color: Color, cue_id: int, emit_flow: StringName) -
 			continue
 		cnode.set_slot_color_left(cslot, color)
 
-func _on_title_text_changed(new_text: String) -> void:
+func _on_title_text_submitted(new_text: String) -> void:
 	var old_text := scenario.title
 	_undo_redo.create_action('Change Scenario Title', UndoRedo.MERGE_ENDS)
 	_undo_redo.add_do_property(scenario, &'title', new_text)
 	_undo_redo.add_undo_property(scenario, &'title', old_text)
 	_undo_redo.commit_action()
+
+func _on_title_focus_exited() -> void:
+	_title.text_submitted.emit(_title.text)

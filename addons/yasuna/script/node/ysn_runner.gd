@@ -1,6 +1,7 @@
+@tool
 class_name YSNRunner extends Node
 
-@export var auto_acts: Array[YSNScenario]
+@export var auto_acts: Array[YSNRunnerAutoAct] = []
 
 var _instances: Dictionary[int, YSNInstance] = {}
 
@@ -17,17 +18,19 @@ func _exit_tree() -> void:
 
 func _ready() -> void:
 	if auto_acts:
-		for scenario in auto_acts:
-			if scenario:
-				act.call_deferred(scenario)
+		_auto_acts.call_deferred()
 
-func act(scenario: YSNScenario) -> YSNInstance:
+func _auto_acts() -> void:
+	for a in auto_acts:
+		act(a.scenario, a.begin_name)
+
+func act(scenario: YSNScenario, begin_name := &'main') -> YSNInstance:
 	var sid := _get_valid_sid()
 	var instance := YSNInstance.new()
 	instance._set_initialize(sid, self, scenario)
 	_instances[sid] = instance
-	instance._queue_emit(1, &'') # TODO: better begin finding
-	instance._run()
+	instance._begin(begin_name)
+
 	if EngineDebugger.is_active():
 		EngineDebugger.send_message('yasuna:instance_started', [instance.get_instance_id(), get_instance_id(), scenario.resource_path])
 	return instance

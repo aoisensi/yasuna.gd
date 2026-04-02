@@ -9,18 +9,18 @@ class_name YSNScenario extends Resource
 	get:
 		return title
 
+var _begin_cues: Dictionary[StringName, int] = {}
+
 @export_storage
-var _cues: Dictionary = {
-	1: {&'cue': YSNCueBegin.new()}
-}:
+var _cues: Dictionary = _initial_cues():
 	set(value):
-		if _cues == value:
-			return
 		for id in value:
 			var data = value[id]
 			var cue := data.cue as YSNCue
 			cue._scenario = self
 			cue.changed.connect(_on_cue_changed.bind(id))
+			if cue is YSNCueBegin:
+				_begin_cues[cue.begin_name] = id
 		_cues = value
 	get:
 		return _cues
@@ -32,9 +32,12 @@ var _cues_emit_flows: Dictionary[int, Array]
 func add_cue(cue: YSNCue, id: int, position := Vector2.ZERO) -> void:
 	assert(cue)
 	assert(not _cues.has(id))
+	assert(not cue.scenario)
 	cue._scenario = self
 	var data := {&'cue': cue}
 	cue.changed.connect(_on_cue_changed.bind(id))
+	if cue is YSNCueBegin:
+		_begin_cues[cue.begin_name] = id
 	if position:
 		data.position = position
 	_cues[id] = data
@@ -142,6 +145,11 @@ func get_valid_cue_id() -> int: # maybe bad code
 func remove_cue(id: int) -> bool:
 	if not _cues.has(id):
 		return false
+	
+	var cue := get_cue(id)
+	if cue is YSNCueBegin and cue.begin_cue == &'main':
+		return false
+
 	for cue_id in _cues:
 		var data := _get_cue_data(cue_id)
 		var connections := data.get(&'connections')
@@ -149,11 +157,17 @@ func remove_cue(id: int) -> bool:
 			continue
 		for emitter in connections:
 			connections[emitter].erase(id)
-	var cue := get_cue(id)
 	cue.changed.disconnect(_on_cue_changed.bind(id))
 	_cues.erase(id)
 	emit_changed()
 	return true
+
+func find_cue_id(cue: YSNCue) -> int:
+	for id in _cues:
+		var data: Dictionary = _cues[id]
+		if data.cue == cue:
+			return id
+	return 0
 
 func set_cue_position(id: int, position := Vector2.ZERO) -> void:
 	_get_cue_data(id)[&'position'] = position
@@ -163,8 +177,23 @@ func set_cue_size(id: int, size := Vector2.ZERO) -> void:
 	_get_cue_data(id)[&'size'] = size
 	emit_changed()
 
-func get_begin_cue() -> YSNCueBegin:
-	return _cues[1]
+func get_begin_cue(begin_name := &'main') -> int:
+	return _begin_cues.get(begin_name)
+
+func get_begin_cue_names() -> Array[StringName]:
+	return _begin_cues.keys()
+
+func get_valid_begin_cue_name() -> StringName:
+	var i := 0
+	var name := &''
+	while true:
+		name = StringName('begin_%d' % i)
+		if not has_begin_cue_name(name):
+			break
+	return name
+
+func has_begin_cue_name(name: StringName) -> bool:
+	return _begin_cues.has(name)
 
 func _on_cue_changed(cue_id: int) -> void:
 	var cue := get_cue(cue_id)
@@ -202,3 +231,8 @@ func _get_cue_data(id: int) -> Dictionary:
 	assert(data)
 	return data
 
+func _initial_cues() -> Dictionary:
+	var cue := YSNCueBegin.new()
+	cue._scenario = self
+	cue.begin_name = &'main'
+	return {1: {cue = cue}}
