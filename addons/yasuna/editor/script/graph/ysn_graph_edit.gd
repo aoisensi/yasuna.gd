@@ -18,6 +18,7 @@ var _undo_redo := EditorInterface.get_editor_undo_redo()
 
 var _debugger: Object
 
+
 func _init(scenario: YSNScenario, debugger: Object = null) -> void:
 	_scenario = scenario
 	_debugger = debugger
