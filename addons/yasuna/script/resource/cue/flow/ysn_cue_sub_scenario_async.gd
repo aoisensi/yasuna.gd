@@ -9,6 +9,14 @@ class_name YSNCueSubScenarioAsync extends YSNCueAsync
 	get:
 		return sub_scenario
 
+@export var begin_name := &'main':
+	set(value):
+		if begin_name != value:
+			begin_name = value
+			emit_changed()
+	get:
+		return begin_name
+
 
 func _get_state_class() -> Script:
 	return State
@@ -29,7 +37,7 @@ class State extends YSNCueAsync.State:
 
 	func _perfome(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueSubScenarioAsync
-		var instance := context.runner.act(cue.sub_scenario)
+		var instance := context.runner.act(cue.sub_scenario, cue.begin_name)
 		sid = instance.sid
 		if instance.is_finished: # when immediately scenario
 			return
