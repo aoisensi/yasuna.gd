@@ -69,7 +69,7 @@ func _get_cue_node(id: int) -> _YSNGraphNode:
 
 func _create_cue_node(id: int) -> _YSNGraphNode:
 	var cue := scenario.get_cue(id)
-	var node := _YSNGraphNode.new(self, cue, id)
+	var node := _YSNGraphNode.new(self, cue, id, _debugger)
 	if _debugger:
 		node.draggable = false
 	add_child(node)

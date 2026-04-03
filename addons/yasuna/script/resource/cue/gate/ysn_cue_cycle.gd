@@ -32,7 +32,7 @@ func _get_editor_title() -> StringName:
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/analyze.svg')
 
-func _get_editor_custom_action() -> Control:
+func _create_editor_custom_action(parameters: Dictionary) -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'count')
 
 

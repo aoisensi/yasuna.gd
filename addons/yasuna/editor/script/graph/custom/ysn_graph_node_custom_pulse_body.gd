@@ -5,13 +5,14 @@ var _cue: YSNCuePulse
 var _wait_spinner: EditorSpinSlider
 
 
-func _init(cue: YSNCuePulse) -> void:
+func _init(cue: YSNCuePulse, editable: bool) -> void:
 	_cue = cue
 	_cue.changed.connect(_on_cue_changed)
 
 	custom_minimum_size = Vector2(240.0, 0.0)
 
 	_wait_spinner = EditorSpinSlider.new()
+	_wait_spinner.read_only = not editable
 	_wait_spinner.allow_greater = true
 	_wait_spinner.max_value = 10.0
 	_wait_spinner.min_value = 0.05

@@ -4,13 +4,14 @@ var _cue: YSNCue
 var _property: StringName
 
 
-func _init(cue: YSNCue, property: StringName) -> void:
+func _init(cue: YSNCue, editable: bool, property: StringName) -> void:
 
 	custom_minimum_size = Vector2(240.0, 0.0)
 
 	_cue = cue
 	_property = property
 
+	self.editable = editable
 	base_type = 'YSNScenario'
 
 	_cue.changed.connect(_on_cue_changed)

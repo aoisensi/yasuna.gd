@@ -4,10 +4,11 @@ extends TextEdit
 var _cue: YSNCuePrint
 
 
-func _init(cue: YSNCuePrint) -> void:
+func _init(cue: YSNCuePrint, editable: bool) -> void:
 	_cue = cue
 	_cue.changed.connect(_on_cue_changed)
 
+	self.editable = editable
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	custom_minimum_size = Vector2(240.0, 60.0)
 	text_changed.connect(_on_text_changed)

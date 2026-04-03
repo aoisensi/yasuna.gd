@@ -8,16 +8,19 @@ var _editor: _YSNGraphEdit
 var _cue: YSNCue
 var _id: int
 
+var _debugger: Object
+
 var _slots_node: Array[Control] = []
 var _receive_flows: Array[StringName] = []
 var _emit_flows: Array[StringName] = []
 
 var _icon: TextureButton
 
-func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int) -> void:
+func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int, debugger: Object = null) -> void:
 	_editor = editor
 	_cue = cue
 	_id = id
+	_debugger = debugger
 	_cue.changed.connect(_on_cue_changed)
 	dragged.connect(_on_dragged)
 	cue.script_changed.connect(_on_cue_script_changed.call_deferred)
@@ -44,8 +47,11 @@ func _on_cue_changed() -> void:
 	get_titlebar_hbox().self_modulate = _cue._get_editor_node_color()
 
 func _on_cue_script_changed() -> void:
-	_custom_body = _cue._get_editor_custom_body()
-	_custom_action = _cue._get_editor_custom_action()
+	var parameters: Dictionary = {
+		editable = not _debugger,
+	}
+	_custom_body = _cue._create_editor_custom_body(parameters)
+	_custom_action = _cue._create_editor_custom_action(parameters)
 	_icon.texture_normal = _cue._get_editor_icon()
 
 func _on_dragged(from: Vector2, to: Vector2) -> void:

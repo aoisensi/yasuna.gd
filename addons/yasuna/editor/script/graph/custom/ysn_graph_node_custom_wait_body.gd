@@ -4,12 +4,13 @@ extends EditorSpinSlider
 var _cue: YSNCueWait
 
 
-func _init(cue: YSNCueWait) -> void:
+func _init(cue: YSNCueWait, editable: bool) -> void:
 	_cue = cue
 	_cue.changed.connect(_on_cue_changed)
 
 	custom_minimum_size = Vector2(240.0, 0.0)
 	
+	read_only = not editable
 	allow_greater = true
 	max_value = 10.0
 	step = 0.01

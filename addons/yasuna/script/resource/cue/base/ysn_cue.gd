@@ -26,10 +26,10 @@ func _get_editor_title() -> StringName:
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/circle.svg')
 
-func _get_editor_custom_body() -> Control:
+func _create_editor_custom_body(parameters: Dictionary) -> Control:
 	return null
 
-func _get_editor_custom_action() -> Control:
+func _create_editor_custom_action(parameters: Dictionary) -> Control:
 	return null
 
 func _is_editor_node_resizable() -> bool:

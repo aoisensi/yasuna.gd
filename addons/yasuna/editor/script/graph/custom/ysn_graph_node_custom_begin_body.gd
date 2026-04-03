@@ -4,13 +4,14 @@ extends LineEdit
 var _cue: YSNCueBegin
 
 
-func _init(cue: YSNCueBegin) -> void:
+func _init(cue: YSNCueBegin, editable: bool) -> void:
 	_cue = cue
 	_cue.changed.connect(_on_cue_changed)
 
 	custom_minimum_size = Vector2(240.0, 0.0)
 
 	placeholder_text = 'Empty is not available'
+	self.editable = editable
 
 	text_submitted.connect(_on_text_submitted)
 	text_changed.connect(_on_text_changed)

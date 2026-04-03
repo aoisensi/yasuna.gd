@@ -29,8 +29,8 @@ func _get_editor_title() -> StringName:
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/flag.svg')
 
-func _get_editor_custom_body() -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_begin_body.gd').new(self)
+func _create_editor_custom_body(parameters: Dictionary) -> Control:
+	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_begin_body.gd').new(self, parameters.editable)
 
 func _get_editor_node_color() -> Color:
 	return Color.RED

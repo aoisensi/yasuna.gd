@@ -25,7 +25,7 @@ func _get_editor_title() -> StringName:
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/beach.svg')
 
-func _get_editor_custom_body() -> Control:
+func _create_editor_custom_body(parameters: Dictionary) -> Control:
 	return null
 
 func _validate_property(property: Dictionary) -> void:
