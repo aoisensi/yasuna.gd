@@ -33,11 +33,12 @@ func _on_item_activated() -> void:
 		scenario_activated.emit(scenario)
 
 func _on_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index: int) -> void:
-	var scenario = item.get_meta(&'scenario')
+	var scenario: YSNScenario = item.get_meta(&'scenario')
 	match id:
 		_BUTTON_ID_CLOSE:
 			_items.erase(scenario)
 			item.get_parent().remove_child(item)
+			scenario.changed.disconnect(_on_scenario_changed)
 			scenario_closed.emit(scenario)
 
 func _create_item(scenario: YSNScenario) -> TreeItem:
