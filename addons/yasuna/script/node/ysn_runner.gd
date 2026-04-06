@@ -1,4 +1,3 @@
-@tool
 class_name YSNRunner extends Node
 
 @export var auto_acts: Array[YSNRunnerAutoAct] = []
