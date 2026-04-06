@@ -20,6 +20,7 @@ func _init() -> void:
 	_split.add_child(_graph_list)
 	add_child(_split)
 	_graph_list.scenario_activated.connect(_on_graph_list_scenario_activated)
+	_graph_list.scenario_closed.connect(_on_graph_list_scenario_closed)
 
 func edit(scenario: YSNScenario) -> void:
 	_graph_list.add(scenario)
@@ -35,6 +36,15 @@ func _on_graph_list_scenario_activated(scenario: YSNScenario) -> void:
 	_graph_edit = _YSNGraphEdit.new(scenario)
 	_split.add_child(_graph_edit)
 	_split.move_child(_graph_edit, 1)
+
+func _on_graph_list_scenario_closed(scenario: YSNScenario) -> void:
+	if not scenario:
+		return
+	if _graph_edit:
+		if _graph_edit.scenario == scenario:
+			_graph_edit.save()
+			_split.remove_child(_graph_edit)
+			_graph_edit.queue_free()
 
 func _on_plugin_resource_saved(resource: Resource) -> void:
 	if resource is YSNScenario:
