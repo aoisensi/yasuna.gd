@@ -6,7 +6,7 @@ Graph-based stateful scenario addon for Godot 4.
 It supports stateful and asynchronous execution for dialogue, events, and gameplay logic.
 
 > [!WARNING]
-> yasuna.gd is still in an early stage of development.  
+> yasuna is still in an early stage of development.  
 > It is not yet recommended for production use or even experimental use in real projects.
 
 ## License
