@@ -28,9 +28,9 @@ func _get_editor_node_color() -> Color:
 class State extends YSNCueStateful.State:
 
 	func _received(context: YSNContext) -> void:
-		await _perfome(context)
+		await _perform(context)
 		context.emit_flow(EMIT_FLOW_COMPLETED)
 		context._remove_state(self)
 
 	@abstract
-	func _perfome(context: YSNContext) -> void
+	func _perform(context: YSNContext) -> void

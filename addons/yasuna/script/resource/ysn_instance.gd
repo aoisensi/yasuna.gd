@@ -31,7 +31,7 @@ var _running := false
 var _is_finished := false
 var is_finished: bool:
 	get:
-		return is_finished
+		return _is_finished
 
 signal finished
 
@@ -118,7 +118,7 @@ func _check_alive() -> void:
 func _finish() -> void:
 	if is_finished:
 		return
-	is_finished = true
+	_is_finished = true
 	runner._finish_instance(self)
 	finished.emit()
 

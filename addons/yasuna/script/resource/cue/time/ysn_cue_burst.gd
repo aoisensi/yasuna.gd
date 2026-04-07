@@ -52,7 +52,7 @@ class State extends YSNCueAsync.State:
 
 	var _timer: Timer
 
-	func _perfome(context: YSNContext) -> void:
+	func _perform(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueBurst
 		if cue.count == 0:
 			return

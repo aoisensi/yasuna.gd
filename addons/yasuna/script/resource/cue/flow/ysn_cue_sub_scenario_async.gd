@@ -35,7 +35,7 @@ class State extends YSNCueAsync.State:
 
 	@export var sid: int
 
-	func _perfome(context: YSNContext) -> void:
+	func _perform(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueSubScenarioAsync
 		var instance := context.runner.act(cue.sub_scenario, cue.begin_name)
 		sid = instance.sid

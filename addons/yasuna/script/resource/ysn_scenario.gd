@@ -147,7 +147,7 @@ func remove_cue(id: int) -> bool:
 		return false
 	
 	var cue := get_cue(id)
-	if cue is YSNCueBegin and cue.begin_cue == &'main':
+	if cue is YSNCueBegin and cue.begin_name == &'main':
 		return false
 
 	for cue_id in _cues:

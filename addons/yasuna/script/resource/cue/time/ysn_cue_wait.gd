@@ -39,7 +39,7 @@ class State extends YSNCueAsync.State:
 
 	var _timer: SceneTreeTimer
 
-	func _perfome(context: YSNContext) -> void:
+	func _perform(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueWait
 		_timer = _create_timer(context)
 		await _timer.timeout
