@@ -43,8 +43,6 @@ func _create_editor_custom_body(parameters: Dictionary) -> Control:
 
 
 class State extends YSNCueReactive.State:
-	
-	@export var time_left: float
 
 	var _timer: Timer
 
@@ -54,16 +52,20 @@ class State extends YSNCueReactive.State:
 			RECEIVE_FLOW_START:
 				if _timer:
 					return
-				_timer = Timer.new()
-				context.runner.add_child(_timer, false, Node.INTERNAL_MODE_BACK)
-				_timer.wait_time = cue.time_sec
-				_timer.process_mode = Node.PROCESS_MODE_ALWAYS if cue.process_always else Node.PROCESS_MODE_PAUSABLE
-				_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS if cue.process_in_physics else Timer.TIMER_PROCESS_IDLE
-				_timer.ignore_time_scale = cue.ignore_time_scale
-				_timer.timeout.connect(_pulsed.bind(context))
+				_create_timer(context)
 				_timer.start()
 			RECEIVE_FLOW_RESET:
 				_destroy()
+
+	func _create_timer(context: YSNContext) -> void:
+		var cue := context.cue as YSNCuePulse
+		_timer = Timer.new()
+		context.runner.add_child(_timer, false, Node.INTERNAL_MODE_BACK)
+		_timer.wait_time = cue.time_sec
+		_timer.process_mode = Node.PROCESS_MODE_ALWAYS if cue.process_always else Node.PROCESS_MODE_PAUSABLE
+		_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS if cue.process_in_physics else Timer.TIMER_PROCESS_IDLE
+		_timer.ignore_time_scale = cue.ignore_time_scale
+		_timer.timeout.connect(_pulsed.bind(context))
 
 	func _pulsed(context: YSNContext) -> void:
 		context.emit_flow(EMIT_FLOW_PULSED)
@@ -74,6 +76,14 @@ class State extends YSNCueReactive.State:
 			_timer.queue_free()
 			_timer = null
 
-	func _capturing() -> void:
+	func _capture() -> Dictionary:
 		if _timer:
-			time_left = _timer.time_left
+			return {time_left = _timer.time_left, running = true}
+		else:
+			return {running = false}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		if data.running:
+			await context.runner.get_tree().create_timer(data.time_left).timeout
+			_create_timer(context)
+			_timer.start()

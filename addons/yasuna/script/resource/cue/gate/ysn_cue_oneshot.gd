@@ -25,7 +25,8 @@ func _get_editor_icon() -> Texture2D:
 
 class State extends YSNCueReactive.State:
 
-	@export var evaluated := false
+	var evaluated := false
+
 
 	func _evaluate(context: YSNContext) -> void:
 		if context.flow == YSNCue.RECEIVE_FLOW_ENTER:
@@ -33,3 +34,9 @@ class State extends YSNCueReactive.State:
 				return
 			evaluated = true
 			context.emit_flow(EMIT_FLOW_ONCE)
+
+	func _capture() -> Dictionary:
+		return {evaluated = evaluated}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		evaluated = data.evaluated

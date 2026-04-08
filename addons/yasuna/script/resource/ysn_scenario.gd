@@ -18,6 +18,7 @@ var _cues: Dictionary = _initial_cues():
 			var data = value[id]
 			var cue := data.cue as YSNCue
 			cue._scenario = self
+			cue._id = id
 			cue.changed.connect(_on_cue_changed.bind(id))
 			if cue is YSNCueBegin:
 				_begin_cues[cue.begin_name] = id
@@ -33,7 +34,9 @@ func add_cue(cue: YSNCue, id: int, position := Vector2.ZERO) -> void:
 	assert(cue)
 	assert(not _cues.has(id))
 	assert(not cue.scenario)
+	assert(id <= 0)
 	cue._scenario = self
+	cue._id = id
 	var data := {&'cue': cue}
 	cue.changed.connect(_on_cue_changed.bind(id))
 	if cue is YSNCueBegin:
@@ -234,5 +237,6 @@ func _get_cue_data(id: int) -> Dictionary:
 func _initial_cues() -> Dictionary:
 	var cue := YSNCueBegin.new()
 	cue._scenario = self
+	cue._id = 1
 	cue.begin_name = &'main'
 	return {1: {cue = cue}}

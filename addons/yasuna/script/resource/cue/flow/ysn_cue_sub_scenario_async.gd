@@ -33,12 +33,22 @@ func _create_editor_custom_body(parameters: Dictionary) -> Control:
 
 class State extends YSNCueAsync.State:
 
-	@export var sid: int
+	var sid: int
 
 	func _perform(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueSubScenarioAsync
 		var instance := context.runner.act(cue.sub_scenario, cue.begin_name)
 		sid = instance.sid
-		if instance.is_finished: # when immediately scenario
-			return
-		await instance.finished
+		if not instance.is_finished: # when immediately scenario
+			await instance.finished
+		complete(context)
+
+	func _capture() -> Dictionary:
+		return {sid = sid}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		sid = data.sid
+		var instance := context.runner._instances[sid]
+		if not instance.is_finished:
+			await instance.finished
+		complete(context)

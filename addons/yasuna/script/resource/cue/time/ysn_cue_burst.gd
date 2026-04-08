@@ -47,8 +47,7 @@ func _create_editor_custom_body(parameters: Dictionary) -> Control:
 
 class State extends YSNCueAsync.State:
 
-	@export var counter := 0
-	@export var time_left: float
+	var counter := 0
 
 	var _timer: Timer
 
@@ -57,10 +56,7 @@ class State extends YSNCueAsync.State:
 		if cue.count == 0:
 			return
 		_timer = Timer.new()
-		context.runner.add_child(_timer, false, Node.INTERNAL_MODE_BACK)
-		_timer.process_mode = Node.PROCESS_MODE_ALWAYS if cue.process_always else Node.PROCESS_MODE_PAUSABLE
-		_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS if cue.process_in_physics else Timer.TIMER_PROCESS_IDLE
-		_timer.ignore_time_scale = cue.ignore_time_scale
+		_create_timer(context)
 		_timer.start(cue.time_sec)
 		while true:
 			context.emit_flow(EMIT_FLOW_BURSTED)
@@ -76,6 +72,20 @@ class State extends YSNCueAsync.State:
 			_timer.queue_free()
 			_timer = null
 
-	func _capturing() -> void:
-		if _timer:
-			time_left = _timer.time_left
+	func _capture() -> Dictionary:
+		return {
+			counter = counter,
+			time_left = _timer.time_left,
+		}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		counter = data.counter
+		await context.runner.get_tree().create_timer(data.time_left).timeout
+		_perform(context)
+
+	func _create_timer(context: YSNContext) -> void:
+		_timer = Timer.new()
+		context.runner.add_child(_timer, false, Node.INTERNAL_MODE_BACK)
+		_timer.process_mode = Node.PROCESS_MODE_ALWAYS if cue.process_always else Node.PROCESS_MODE_PAUSABLE
+		_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS if cue.process_in_physics else Timer.TIMER_PROCESS_IDLE
+		_timer.ignore_time_scale = cue.ignore_time_scale

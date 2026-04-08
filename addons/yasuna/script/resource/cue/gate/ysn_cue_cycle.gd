@@ -38,10 +38,16 @@ func _create_editor_custom_action(parameters: Dictionary) -> Control:
 
 class State extends YSNCueReactive.State:
 
-	@export var counted := 0
+	var counted := 0
 
 	func _evaluate(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueCycle
 		counted %= cue.count
 		counted += 1
 		context.emit_flow(str(counted))
+
+	func _capture() -> Dictionary:
+		return {counted = counted}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		counted = data.counted

@@ -29,6 +29,8 @@ class State extends YSNCueStateful.State:
 
 	func _received(context: YSNContext) -> void:
 		await _perform(context)
+
+	func complete(context: YSNContext) -> void:
 		context.emit_flow(EMIT_FLOW_COMPLETED)
 		context._remove_state(self)
 

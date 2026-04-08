@@ -17,9 +17,6 @@ func _received(context: YSNContext) -> void:
 func _get_receive_flows() -> Array[StringName]:
 	return [RECEIVE_FLOW_RESET]
 
-func _get_state_class() -> Script:
-	return State
-
 func _is_ephemeral() -> bool:
 	return true
 

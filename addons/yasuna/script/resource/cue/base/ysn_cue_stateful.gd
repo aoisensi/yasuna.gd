@@ -10,12 +10,16 @@ func _is_ephemeral() -> bool:
 
 
 @abstract
-class State extends Resource:
+class State extends RefCounted:
 
-	@export var _cue: YSNCueStateful
+	var _cue_id: int
+	var cue_id:
+		get:
+			return _cue_id
+
 	var cue: YSNCueStateful:
 		get:
-			return _cue
+			return _instance.scenario.get_cue(_cue_id)
 
 	var _instance: YSNInstance
 	var instance: YSNInstance:
@@ -28,8 +32,11 @@ class State extends Resource:
 	@abstract
 	func _received(context: YSNContext) -> void
 
-	func _capturing() -> void:
-		pass
+	@abstract
+	func _capture() -> Dictionary
+
+	@abstract
+	func _restore(context: YSNContext, data: Dictionary) -> void
 
 	func _destroy() -> void:
 		pass

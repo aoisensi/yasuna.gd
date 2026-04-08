@@ -16,7 +16,9 @@ var scenario: YSNScenario:
 	get:
 		return _scenario
 
-@export var _states: Dictionary[YSNCueStateful, Array] = {}
+@export_storage
+var _states: Dictionary[int, Array] = {}
+
 @export var _counter: int = 0:
 	set(value):
 		_counter = value
@@ -36,14 +38,21 @@ var is_finished: bool:
 signal finished
 
 
-func _set_initialize(sid: int, runner: YSNRunner, scenario: YSNScenario) -> void:
+static func _from_captured(runner: YSNRunner, data: Dictionary) -> YSNInstance:
+	var instance := new()
+	var scenario := load(data.scenario)
+	assert(scenario is YSNScenario)
+	instance._setup(data.sid, runner, scenario)
+	return instance
+
+func _setup(sid: int, runner: YSNRunner, scenario: YSNScenario) -> void:
 	_sid = sid
 	_runner = runner
 	_scenario = scenario
 
 func _get_states(cue: YSNCueStateful) -> Array[YSNCueStateful.State]:
 	var result: Array[YSNCueStateful.State] = []
-	result.assign(_states.get_or_add(cue, []))
+	result.assign(_states.get_or_add(cue.id, []))
 	return result
 
 func _create_state(cue: YSNCueStateful) -> YSNCueStateful.State:
@@ -51,13 +60,13 @@ func _create_state(cue: YSNCueStateful) -> YSNCueStateful.State:
 		_counter += 1
 	var state = cue._get_state_class().new()
 	assert(state is YSNCueStateful.State)
-	state._cue = cue
+	state._cue_id = cue.id
 	state._instance = self
 	_add_state(state)
 	return state
 
 func _remove_state(state: YSNCueStateful.State) -> void:
-	var states: Array = _states.get(state.cue)
+	var states: Array = _states.get(state.cue.id)
 	if not states:
 		return
 	if states.has(state):
@@ -65,15 +74,15 @@ func _remove_state(state: YSNCueStateful.State) -> void:
 		if not state.cue._is_ephemeral():
 			_counter -= 1
 		if not states:
-			_states.erase(state.cue)
+			_states.erase(state.cue.id)
 
 func _remove_states(cue: YSNCueStateful) -> void:
 	if not cue._is_ephemeral():
-		_counter -= _states.get(cue, []).size()
-	_states.erase(cue)
+		_counter -= _states.get(cue.id, []).size()
+	_states.erase(cue.id)
 
 func _add_state(state: YSNCueStateful.State) -> void:
-	_states.get_or_add(state.cue, []).append(state)
+	_states.get_or_add(state.cue.id, []).append(state)
 
 func _run() -> void:
 	if is_finished:
@@ -122,11 +131,27 @@ func _finish() -> void:
 	runner._finish_instance(self)
 	finished.emit()
 
-func _capture() -> YSNInstance:
-	for states in _states.values():
-		for state in states:
-			(state as YSNCueStateful.State)._capturing()
-	return duplicate_deep(DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
+func _capture() -> Dictionary:
+	var states: Dictionary = {}
+	var result: Dictionary = {
+		sid = sid,
+		scenario = scenario.resource_path,
+		states = states,
+	}
+	for cue_id in _states:
+		for state in _states[cue_id]:
+			var data = state._capture()
+			states.get_or_add(str(cue_id), []).append(data)
+	return result
+
+func _restore(data: Dictionary) -> void:
+	for cue_id_str in data:
+		var cue_id = int(cue_id_str)
+		var cue := scenario.get_cue(cue_id) as YSNCueStateful
+		for d in data[cue_id_str]:
+			var state := _create_state(cue)
+			var context := YSNContext.new(self, cue_id, &'')
+			state._restore(context, d)
 
 func _abort() -> void:
 	_is_canceled = true

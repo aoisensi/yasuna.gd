@@ -40,7 +40,7 @@ func _get_editor_icon() -> Texture2D:
 
 class State extends YSNCueReactive.State:
 
-	@export var flags := 0
+	var flags := 0
 
 	func _evaluate(context: YSNContext) -> void:
 		var flow := context.flow.to_int()
@@ -52,3 +52,9 @@ class State extends YSNCueReactive.State:
 			context.emit_flow(EMIT_FLOW_DONE)
 			if cue.reset_when_done:
 				flags = 0
+
+	func _capture() -> Dictionary:
+		return {flags = flags}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		flags = data.flags

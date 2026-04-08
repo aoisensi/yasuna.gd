@@ -26,7 +26,7 @@ func _auto_acts() -> void:
 func act(scenario: YSNScenario, begin_name := &'main') -> YSNInstance:
 	var sid := _get_valid_sid()
 	var instance := YSNInstance.new()
-	instance._set_initialize(sid, self, scenario)
+	instance._setup(sid, self, scenario)
 	_instances[sid] = instance
 	instance._begin(begin_name)
 
@@ -34,15 +34,35 @@ func act(scenario: YSNScenario, begin_name := &'main') -> YSNInstance:
 		EngineDebugger.send_message('yasuna:instance_started', [instance.get_instance_id(), get_instance_id(), scenario.resource_path])
 	return instance
 
-func capture() -> YSNCapture:
-	var result := YSNCapture.new()
+func capture() -> Dictionary:
+	var instances: Dictionary = {}
+	var result: Dictionary = {instances = instances}
 	for sid in _instances:
 		var instance := _instances[sid]
-		result.instances[sid] = instance._capture()
+		instances[str(sid)] = instance._capture()
 	return result
 
-func restore(capture: YSNCapture) -> void:
-	pass
+func restore(data: Dictionary) -> void:
+	var instances: Dictionary = data.instances
+	assert(instances)
+
+	abort_all()
+
+	for sid_str in instances:
+		var sid := int(sid_str)
+		var instance := YSNInstance.new()
+		var scenario := load(instances[sid_str].scenario)
+		assert(scenario is YSNScenario)
+		instance._setup(sid, self, scenario)
+		instance._restore(instances[sid_str].states)
+		_instances[sid] = instance
+
+func abort_all() -> void:
+	for sid in _instances:
+		var instance := _instances[sid]
+		instance._abort()
+
+	_instances.clear()
 
 func _finish_instance(instance: YSNInstance) -> void:
 	var scenario = instance.scenario
@@ -52,10 +72,12 @@ func _finish_instance(instance: YSNInstance) -> void:
 	finished.emit(scenario)
 
 func _get_valid_sid() -> int:
+	var id := 0
 	while true:
-		var id := randi()
-		if id == 0:
-			continue
-		if not _instances.has(id):
-			return id
-	return 0 # unreachable
+		var h := int(randi()) & 0x7fffffff
+		var l := int(randi()) & 0xffffffff
+		id = (h << 32) | l
+		if id != 0 or not _instances.has(id):
+			break
+		# ultra jackpot
+	return id

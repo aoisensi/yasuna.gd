@@ -31,25 +31,26 @@ func _create_editor_custom_body(parameters: Dictionary) -> Control:
 
 class State extends YSNCueAsync.State:
 
-	@export var time_left: float:
-		set(value):
-			time_left = max(0.0, value)
-		get:
-			return time_left
-
 	var _timer: SceneTreeTimer
+
 
 	func _perform(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueWait
-		_timer = _create_timer(context)
+		var time_sec := cue._get_time_sec()
+		_timer = _create_timer(context, time_sec)
 		await _timer.timeout
+		complete(context)
 
-	func _create_timer(context: YSNContext) -> SceneTreeTimer:
+	func _create_timer(context: YSNContext, time_sec: float) -> SceneTreeTimer:
 		var cue := context.cue as YSNCueWait
 		var tree := context.runner.get_tree()
-		var time_sec := cue._get_time_sec()
 		return tree.create_timer(time_sec, cue.process_always, cue.process_in_physics, cue.ignore_time_scale)
 
-	func _capturing() -> void:
-		if _timer:
-			time_left = _timer.time_left
+	func _capture() -> Dictionary:
+		return {time_left = _timer.time_left}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		_timer = _create_timer(context, data.time_left)
+		await _timer.timeout
+		complete(context)
+

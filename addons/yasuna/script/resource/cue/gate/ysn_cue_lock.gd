@@ -29,7 +29,7 @@ func _get_editor_icon() -> Texture2D:
 
 class State extends YSNCueReactive.State:
 
-	@export var unlocked: bool
+	var unlocked: bool
 
 
 	func _setup(context: YSNContext) -> void:
@@ -50,3 +50,9 @@ class State extends YSNCueReactive.State:
 				unlocked = not unlocked
 			RECEIVE_FLOW_UNLOCK:
 				unlocked = true
+
+	func _capture() -> Dictionary:
+		return {unlocked = unlocked}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		unlocked = data.unlocked

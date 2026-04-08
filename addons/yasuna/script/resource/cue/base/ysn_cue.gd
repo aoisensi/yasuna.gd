@@ -5,6 +5,11 @@ class_name YSNCue extends Resource
 const RECEIVE_FLOW_ENTER = &'enter'
 
 
+var _id: int
+var id: int:
+	get:
+		return _id
+
 var _scenario: YSNScenario
 var scenario: YSNScenario:
 	get:

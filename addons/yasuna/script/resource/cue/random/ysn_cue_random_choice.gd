@@ -47,7 +47,7 @@ func _create_editor_custom_action(parameters: Dictionary) -> Control:
 class State extends YSNCueReactive.State:
 
 	var _random := RandomNumberGenerator.new()
-	@export var latest: int
+	var latest: int # 0 is unrolled
 
 	func _evaluate(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueRandomChoice
@@ -60,3 +60,9 @@ class State extends YSNCueReactive.State:
 				n += 1
 		latest = n
 		context.emit_flow(str(n))
+
+	func _capture() -> Dictionary:
+		return {latest = 0}
+
+	func _restore(context: YSNContext, data: Dictionary) -> void:
+		latest = data.latest
