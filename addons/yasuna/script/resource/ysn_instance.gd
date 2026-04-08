@@ -38,13 +38,6 @@ var is_finished: bool:
 signal finished
 
 
-static func _from_captured(runner: YSNRunner, data: Dictionary) -> YSNInstance:
-	var instance := new()
-	var scenario := load(data.scenario)
-	assert(scenario is YSNScenario)
-	instance._setup(data.sid, runner, scenario)
-	return instance
-
 func _setup(sid: int, runner: YSNRunner, scenario: YSNScenario) -> void:
 	_sid = sid
 	_runner = runner

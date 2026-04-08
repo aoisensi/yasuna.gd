@@ -34,7 +34,7 @@ func add_cue(cue: YSNCue, id: int, position := Vector2.ZERO) -> void:
 	assert(cue)
 	assert(not _cues.has(id))
 	assert(not cue.scenario)
-	assert(id <= 0)
+	assert(id > 0)
 	cue._scenario = self
 	cue._id = id
 	var data := {&'cue': cue}

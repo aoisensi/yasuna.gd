@@ -54,15 +54,16 @@ func restore(data: Dictionary) -> void:
 		var scenario := load(instances[sid_str].scenario)
 		assert(scenario is YSNScenario)
 		instance._setup(sid, self, scenario)
-		instance._restore(instances[sid_str].states)
 		_instances[sid] = instance
+
+	for sid_str in instance:
+		var sid := int(sid_str)
+		instance._restore(instances[sid_str].states)
 
 func abort_all() -> void:
 	for sid in _instances:
 		var instance := _instances[sid]
 		instance._abort()
-
-	_instances.clear()
 
 func _finish_instance(instance: YSNInstance) -> void:
 	var scenario = instance.scenario
@@ -77,7 +78,7 @@ func _get_valid_sid() -> int:
 		var h := int(randi()) & 0x7fffffff
 		var l := int(randi()) & 0xffffffff
 		id = (h << 32) | l
-		if id != 0 or not _instances.has(id):
+		if id != 0 and not _instances.has(id):
 			break
 		# ultra jackpot
 	return id

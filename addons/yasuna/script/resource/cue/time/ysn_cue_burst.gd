@@ -84,6 +84,7 @@ class State extends YSNCueAsync.State:
 		_perform(context)
 
 	func _create_timer(context: YSNContext) -> void:
+		var cue := context.cue as YSNCueBurst
 		_timer = Timer.new()
 		context.runner.add_child(_timer, false, Node.INTERNAL_MODE_BACK)
 		_timer.process_mode = Node.PROCESS_MODE_ALWAYS if cue.process_always else Node.PROCESS_MODE_PAUSABLE
