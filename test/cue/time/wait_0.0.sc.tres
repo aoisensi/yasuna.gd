@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="YSNScenario" format=3 uid="uid://t5l0qd2wip0d"]
+
+[ext_resource type="Script" uid="uid://r7ffrxbwxgnd" path="res://addons/yasuna/script/resource/cue/flow/ysn_cue_begin.gd" id="1_suv6e"]
+[ext_resource type="Script" uid="uid://b3tyqp7rkuws7" path="res://addons/yasuna/script/resource/cue/time/ysn_cue_wait.gd" id="2_8jfsn"]
+[ext_resource type="Script" uid="uid://b7fyqlr4w7fp2" path="res://addons/yasuna/script/resource/ysn_scenario.gd" id="2_lkw2g"]
+[ext_resource type="Script" uid="uid://0o2h5ft0k3kt" path="res://addons/yasuna/script/resource/cue/debug/ysn_cue_print.gd" id="3_qini7"]
+
+[sub_resource type="Resource" id="Resource_8jfsn"]
+script = ExtResource("1_suv6e")
+begin_name = &"main"
+
+[sub_resource type="Resource" id="Resource_7s2xb"]
+script = ExtResource("2_8jfsn")
+time_sec = 0.0
+
+[sub_resource type="Resource" id="Resource_qini7"]
+script = ExtResource("3_qini7")
+
+[resource]
+script = ExtResource("2_lkw2g")
+_cues = {
+1: {
+&"connections": {
+&"start": {
+2: [&"enter"]
+}
+},
+&"cue": SubResource("Resource_8jfsn")
+},
+2: {
+&"connections": {
+&"completed": {
+3: [&"enter"]
+}
+},
+&"cue": SubResource("Resource_7s2xb"),
+&"position": Vector2(340, 0)
+},
+3: {
+&"connections": {},
+&"cue": SubResource("Resource_qini7"),
+&"position": Vector2(840, 0)
+}
+}
+metadata/_custom_type_script = "uid://b7fyqlr4w7fp2"
