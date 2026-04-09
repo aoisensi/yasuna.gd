@@ -56,9 +56,9 @@ func restore(data: Dictionary) -> void:
 		instance._setup(sid, self, scenario)
 		_instances[sid] = instance
 
-	for sid_str in instance:
+	for sid_str in instances:
 		var sid := int(sid_str)
-		instance._restore(instances[sid_str].states)
+		_instances[sid]._restore(instances[sid_str].states)
 
 func abort_all() -> void:
 	for sid in _instances:

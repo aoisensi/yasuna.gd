@@ -1,32 +1,30 @@
-class_name YSNInstance extends Resource
-
+class_name YSNInstance extends RefCounted
 
 var _runner: YSNRunner
 var runner: YSNRunner:
 	get:
 		return _runner
 
-@export var _sid: int
+var _sid: int
 var sid: int:
 	get:
 		return _sid
 
-@export var _scenario: YSNScenario
+var _scenario: YSNScenario
 var scenario: YSNScenario:
 	get:
 		return _scenario
 
-@export_storage
 var _states: Dictionary[int, Array] = {}
 
-@export var _counter: int = 0:
+var _counter: int = 0:
 	set(value):
 		_counter = value
 		_check_alive()
 	get:
 		return _counter
 
-@export var _is_canceled := false
+var _is_canceled := false
 
 var _queue: Array[Dictionary] = []
 var _running := false
