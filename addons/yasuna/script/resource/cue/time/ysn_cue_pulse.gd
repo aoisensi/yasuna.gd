@@ -70,12 +70,6 @@ class State extends YSNCueReactive.State:
 	func _pulsed(context: YSNContext) -> void:
 		context.emit_flow(EMIT_FLOW_PULSED)
 
-	func _destroy() -> void:
-		if _timer:
-			_timer.get_parent().remove_child(_timer)
-			_timer.queue_free()
-			_timer = null
-
 	func _capture() -> Dictionary:
 		if _timer:
 			return {time_left = _timer.time_left, running = true}
@@ -87,3 +81,10 @@ class State extends YSNCueReactive.State:
 			await context.runner.get_tree().create_timer(data.time_left).timeout
 			_create_timer(context)
 			_timer.start()
+
+	func _destroy() -> void:
+		if _timer:
+			_timer.stop()
+			_timer.get_parent().remove_child(_timer)
+			_timer.queue_free()
+			_timer = null

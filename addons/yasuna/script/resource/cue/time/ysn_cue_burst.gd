@@ -58,19 +58,18 @@ class State extends YSNCueAsync.State:
 		_timer = Timer.new()
 		_create_timer(context)
 		_timer.start(cue.time_sec)
-		while true:
-			context.emit_flow(EMIT_FLOW_BURSTED)
-			counter += 1
-			if counter >= cue.count:
-				_timer.stop()
-				return
-			await _timer.timeout
+		_loop(context)
 
-	func _destroy() -> void:
-		if _timer:
-			_timer.get_parent().remove_child(_timer)
-			_timer.queue_free()
-			_timer = null
+	func _burst(context: YSNContext) -> void:
+		context.emit_flow(EMIT_FLOW_BURSTED)
+		counter += 1
+
+	func _loop(context: YSNContext) -> void:
+		while counter < cue.count:
+			await _timer.timeout
+			_burst(context)
+		_timer.stop()
+		complete(context)
 
 	func _capture() -> Dictionary:
 		return {
@@ -79,9 +78,11 @@ class State extends YSNCueAsync.State:
 		}
 
 	func _restore(context: YSNContext, data: Dictionary) -> void:
+		var cue := context.cue as YSNCueBurst
 		counter = data.counter
-		await context.runner.get_tree().create_timer(data.time_left).timeout
-		_perform(context)
+		await context.runner.get_tree().create_timer(data.time_left, cue.process_always, cue.process_in_physics, cue.ignore_time_scale).timeout
+		_burst(context)
+		_loop(context)
 
 	func _create_timer(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueBurst
@@ -90,3 +91,10 @@ class State extends YSNCueAsync.State:
 		_timer.process_mode = Node.PROCESS_MODE_ALWAYS if cue.process_always else Node.PROCESS_MODE_PAUSABLE
 		_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS if cue.process_in_physics else Timer.TIMER_PROCESS_IDLE
 		_timer.ignore_time_scale = cue.ignore_time_scale
+
+	func _destroy() -> void:
+		if _timer:
+			_timer.stop()
+			_timer.get_parent().remove_child(_timer)
+			_timer.queue_free()
+			_timer = null

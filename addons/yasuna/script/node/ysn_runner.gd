@@ -4,7 +4,9 @@ class_name YSNRunner extends Node
 
 var _instances: Dictionary[int, YSNInstance] = {}
 
-signal finished(scenario: YSNScenario)
+signal completed(scenario: YSNScenario)
+signal aborted(scenario: YSNScenario)
+signal closed(scenario: YSNScenario)
 
 
 func _enter_tree() -> void:
@@ -63,14 +65,14 @@ func restore(data: Dictionary) -> void:
 func abort_all() -> void:
 	for sid in _instances:
 		var instance := _instances[sid]
-		instance._abort()
+		instance.abort()
 
-func _finish_instance(instance: YSNInstance) -> void:
+func _close_instance(instance: YSNInstance) -> void:
 	var scenario = instance.scenario
 	if EngineDebugger.is_active():
-		EngineDebugger.send_message('yasuna:instance_finished', [instance.get_instance_id()])
+		EngineDebugger.send_message('yasuna:instance_closed', [instance.get_instance_id()])
 	_instances.erase(instance.sid)
-	finished.emit(scenario)
+	closed.emit(scenario)
 
 func _get_valid_sid() -> int:
 	var id := 0

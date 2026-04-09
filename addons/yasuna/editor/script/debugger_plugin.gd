@@ -18,8 +18,8 @@ func _capture(message: String, data: Array, session_id: int) -> bool:
 			debugger._runner_exited(data[0])
 		'yasuna:instance_started':
 			debugger._instance_started(data[0], data[1], data[2])
-		'yasuna:instance_finished':
-			debugger._instance_finished(data[0])
+		'yasuna:instance_closed':
+			debugger._instance_closed(data[0])
 		'yasuna:cue_flow_emitted':
 			debugger._cue_flow_emitted(data[0], data[1], data[2])
 		_:

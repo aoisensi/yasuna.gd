@@ -61,7 +61,7 @@ func _instance_started(instance_id: int, runner_id: int, scenario_path: String) 
 	_instances[instance_id] = scenario_path
 	_tree.add_instance(instance_id, runner_id, scenario_path)
 
-func _instance_finished(instance_id: int) -> void:
+func _instance_closed(instance_id: int) -> void:
 	_instances.erase(instance_id)
 	_tree.remove_instance(instance_id)
 

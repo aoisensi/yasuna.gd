@@ -5,7 +5,7 @@ const RECEIVE_FLOW_ABORT = &'abort'
 
 
 func _received(context: YSNContext) -> void:
-	context.instance._abort()
+	context.instance.abort()
 
 func _get_receive_flows() -> Array[StringName]:
 	return [RECEIVE_FLOW_ABORT]

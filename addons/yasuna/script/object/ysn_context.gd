@@ -38,9 +38,6 @@ func emit_flow(flow: StringName) -> void:
 	if EngineDebugger.is_active():
 		EngineDebugger.send_message('yasuna:cue_flow_emitted', [instance.get_instance_id(), id, flow])
 
-	if instance._is_canceled:
-		return
-
 	for connected in scenario.get_connected_cues(id, flow):
 		instance._queue_emit(connected.cue, connected.flow)
 	instance._run()

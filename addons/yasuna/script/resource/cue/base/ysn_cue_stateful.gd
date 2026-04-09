@@ -5,6 +5,7 @@ class_name YSNCueStateful extends YSNCue
 @abstract
 func _get_state_class() -> Script
 
+# If true, the instance will be automatically destroyed even if this state exists.
 func _is_ephemeral() -> bool:
 	return false
 

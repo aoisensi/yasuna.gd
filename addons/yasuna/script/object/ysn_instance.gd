@@ -24,16 +24,18 @@ var _counter: int = 0:
 	get:
 		return _counter
 
-var _is_canceled := false
-
 var _queue: Array[Dictionary] = []
 var _running := false
-var _is_finished := false
-var is_finished: bool:
-	get:
-		return _is_finished
+var _canceling := false
 
-signal finished
+var _is_closed := false
+var is_closed: bool:
+	get:
+		return _is_closed
+
+signal completed
+signal aborted
+signal closed
 
 
 func _setup(sid: int, runner: YSNRunner, scenario: YSNScenario) -> void:
@@ -76,7 +78,7 @@ func _add_state(state: YSNCueStateful.State) -> void:
 	_states.get_or_add(state.cue.id, []).append(state)
 
 func _run() -> void:
-	if is_finished:
+	if is_closed:
 		push_warning()
 		return
 
@@ -84,7 +86,7 @@ func _run() -> void:
 		return
 
 	_running = true
-	while not _queue.is_empty():
+	while (not _queue.is_empty()) and (not _canceling):
 		var next := _queue.pop_front()
 		var cue_id: int = next.cue
 		var cue := scenario.get_cue(cue_id)
@@ -113,14 +115,15 @@ func _begin(begin_name: StringName) -> void:
 
 func _check_alive() -> void:
 	if _counter == 0 and not _running:
-		_finish()
+		if not _canceling:
+			completed.emit()
+			runner.completed.emit(scenario)
+		_close()
 
-func _finish() -> void:
-	if is_finished:
-		return
-	_is_finished = true
-	runner._finish_instance(self)
-	finished.emit()
+func _close() -> void:
+	_is_closed = true
+	closed.emit()
+	runner._close_instance(self)
 
 func _capture() -> Dictionary:
 	var states: Dictionary = {}
@@ -144,11 +147,18 @@ func _restore(data: Dictionary) -> void:
 			var context := YSNContext.new(self, cue_id, &'')
 			state._restore(context, d)
 
-func _abort() -> void:
-	_is_canceled = true
+func abort() -> void:
+	if is_closed:
+		push_warning()
+		return
+
+	_canceling = true
 
 	for states in _states.values():
 		for state in states:
 			state._destroy()
 
-	runner._finish_instance(self)
+	aborted.emit()
+	runner.aborted.emit(scenario)
+
+	_close()
