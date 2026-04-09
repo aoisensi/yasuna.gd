@@ -78,7 +78,8 @@ class State extends YSNCueReactive.State:
 
 	func _restore(context: YSNContext, data: Dictionary) -> void:
 		if data.running:
-			await context.runner.get_tree().create_timer(data.time_left).timeout
+			var cue := context.cue as YSNCuePulse
+			await context.runner.get_tree().create_timer(data.time_left, cue.process_always, cue.process_in_physics, cue.ignore_time_scale).timeout
 			_create_timer(context)
 			_timer.start()
 

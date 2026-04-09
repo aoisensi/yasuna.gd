@@ -55,7 +55,6 @@ class State extends YSNCueAsync.State:
 		var cue := context.cue as YSNCueBurst
 		if cue.count == 0:
 			return
-		_timer = Timer.new()
 		_create_timer(context)
 		_timer.start(cue.time_sec)
 		_loop(context)
@@ -65,6 +64,7 @@ class State extends YSNCueAsync.State:
 		counter += 1
 
 	func _loop(context: YSNContext) -> void:
+		var cue := context.cue as YSNCueBurst
 		while counter < cue.count:
 			await _timer.timeout
 			_burst(context)

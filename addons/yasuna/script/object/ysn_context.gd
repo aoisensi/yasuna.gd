@@ -35,6 +35,9 @@ func _init(instance: YSNInstance, id: int, flow: StringName) -> void:
 	_flow = flow
 
 func emit_flow(flow: StringName) -> void:
+	if instance._canceling:
+		return
+
 	if EngineDebugger.is_active():
 		EngineDebugger.send_message('yasuna:cue_flow_emitted', [instance.get_instance_id(), id, flow])
 
