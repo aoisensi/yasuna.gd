@@ -13,8 +13,7 @@ func after_test() -> void:
 	runner.free()
 	runner = null
 
-func act_scenario(path: String, begin_name := &'main') -> YSNInstance:
+func load_scenario(path: String) -> YSNScenario:
 	if path.is_relative_path():
 		path = (get_script() as Script).resource_path.get_base_dir().path_join(path)
-	var scenario := load(path) as YSNScenario
-	return runner.act(scenario, begin_name)
+	return load(path) as YSNScenario

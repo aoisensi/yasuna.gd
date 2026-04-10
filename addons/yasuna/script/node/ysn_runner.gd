@@ -44,11 +44,13 @@ func capture() -> Dictionary:
 		instances[str(sid)] = instance._capture()
 	return result
 
-func restore(data: Dictionary) -> void:
+func restore(data: Dictionary) -> Array[YSNInstance]:
 	var instances: Dictionary = data.instances
 	assert(instances)
 
 	abort_all()
+
+	var result: Array[YSNInstance] = []
 
 	for sid_str in instances:
 		var sid := int(sid_str)
@@ -57,10 +59,13 @@ func restore(data: Dictionary) -> void:
 		assert(scenario is YSNScenario)
 		instance._setup(sid, self, scenario)
 		_instances[sid] = instance
+		result.append(instance)
 
 	for sid_str in instances:
 		var sid := int(sid_str)
 		_instances[sid]._restore(instances[sid_str].states)
+
+	return result
 
 func abort_all() -> void:
 	for sid in _instances:
