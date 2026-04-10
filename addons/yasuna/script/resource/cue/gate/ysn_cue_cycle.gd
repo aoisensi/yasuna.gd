@@ -1,5 +1,6 @@
 @tool
-class_name YSNCueCycle extends YSNCueReactive
+class_name YSNCueCycle
+extends YSNCueReactive
 
 const MIN_FLOWS = 2
 const MAX_FLOWS = 100
@@ -20,25 +21,30 @@ func _get_receive_flows() -> Array[StringName]:
 	flows.append_array(super._get_receive_flows())
 	return flows
 
+
 func _get_emit_flows() -> Array[StringName]:
 	return _get_number_flows(count)
+
 
 func _get_state_class() -> Script:
 	return State
 
+
 func _get_editor_title() -> StringName:
 	return &'Cycle'
 
+
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/analyze.svg')
+
 
 func _create_editor_custom_action(parameters: Dictionary) -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'count')
 
 
 class State extends YSNCueReactive.State:
-
 	var counted := 0
+
 
 	func _evaluate(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueCycle
@@ -46,8 +52,10 @@ class State extends YSNCueReactive.State:
 		counted += 1
 		context.emit_flow(str(counted))
 
+
 	func _capture() -> Dictionary:
-		return {counted = counted}
+		return { counted = counted }
+
 
 	func _restore(context: YSNContext, data: Dictionary) -> void:
 		counted = data.counted

@@ -21,11 +21,14 @@ func _init(cue: YSNCuePulse, editable: bool) -> void:
 	_wait_spinner.value_changed.connect(_on_wait_spinner_changed)
 	add_child(_wait_spinner)
 
+
 func _ready() -> void:
 	_on_cue_changed()
 
+
 func _on_wait_spinner_changed(value: float) -> void:
 	_cue.time_sec = value
+
 
 func _on_cue_changed() -> void:
 	if _wait_spinner.value != _cue.time_sec:

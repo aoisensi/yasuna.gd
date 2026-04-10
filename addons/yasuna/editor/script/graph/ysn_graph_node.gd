@@ -1,20 +1,56 @@
 @tool
 extends GraphNode
 
-const _YSNGraphEdit = preload('./ysn_graph_edit.gd') 
+enum _CustomSlot { BODY, ACTION }
 
+const _YSNGraphEdit = preload('./ysn_graph_edit.gd')
 
 var _editor: _YSNGraphEdit
 var _cue: YSNCue
 var _id: int
-
 var _debugger: Object
-
 var _slots_node: Array[Control] = []
 var _receive_flows: Array[StringName] = []
 var _emit_flows: Array[StringName] = []
-
 var _icon: TextureButton
+var _custom_body: Control:
+	set(value):
+		if _custom_body == value:
+			return
+		if _custom_body:
+			_custom_body_holder.remove_child(_custom_body)
+			_custom_body.queue_free()
+		_custom_body = value
+		if _custom_body:
+			_custom_body_holder.add_child(_custom_body)
+			add_child(_custom_body_holder)
+			move_child(_custom_body_holder, -1)
+		else:
+			remove_child(_custom_body_holder)
+	get:
+		return _custom_body
+var _custom_body_holder: MarginContainer:
+	get:
+		if not _custom_body_holder:
+			_custom_body_holder = MarginContainer.new()
+			_custom_body_holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			_custom_body_holder.add_theme_constant_override(&'margin_bottom', 12)
+		return _custom_body_holder
+var _custom_action: Control:
+	set(value):
+		if _custom_action == value:
+			return
+		var titlebar := get_titlebar_hbox()
+		if _custom_action:
+			titlebar.remove_child(_custom_action)
+			_custom_action.queue_free()
+		_custom_action = value
+		if _custom_action:
+			titlebar.add_child(_custom_action)
+			titlebar.move_child(_custom_action, -1)
+	get:
+		return _custom_action
+
 
 func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int, debugger: Object = null) -> void:
 	_editor = editor
@@ -33,10 +69,12 @@ func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int, debugger: Object = null)
 	titlebar.add_child(_icon)
 	titlebar.move_child(_icon, 0)
 
+
 func _ready() -> void:
 	_on_cue_changed()
 	_on_cue_script_changed()
 	_on_editor_theme_changed()
+
 
 func _on_cue_changed() -> void:
 	title = _cue._get_editor_title()
@@ -46,6 +84,7 @@ func _on_cue_changed() -> void:
 		size = Vector2.ZERO
 	get_titlebar_hbox().self_modulate = _cue._get_editor_node_color()
 
+
 func _on_cue_script_changed() -> void:
 	var parameters: Dictionary = {
 		editable = not _debugger,
@@ -54,13 +93,16 @@ func _on_cue_script_changed() -> void:
 	_custom_action = _cue._create_editor_custom_action(parameters)
 	_icon.texture_normal = _cue._get_editor_icon()
 
+
 func _on_dragged(from: Vector2, to: Vector2) -> void:
 	# TODO: support UndoRedo
 	_editor.scenario.set_cue_position(_id, to)
 
+
 func _on_editor_theme_changed() -> void:
 	var theme := EditorInterface.get_editor_theme()
 	_icon.modulate = theme.get_color(&'font_color', &'Label')
+
 
 func _check_flows() -> void:
 	var receive_flows := _cue._get_receive_flows()
@@ -72,6 +114,7 @@ func _check_flows() -> void:
 	_emit_flows = emit_flows
 
 	_rebuild_flow_nodes()
+
 
 func _rebuild_flow_nodes() -> void:
 	for node in _slots_node:
@@ -101,48 +144,6 @@ func _rebuild_flow_nodes() -> void:
 		move_child(hbox, i)
 		_slots_node.append(hbox)
 
+
 func _on_resize_request(new_size: Vector2) -> void:
 	_editor.scenario.set_cue_size(_id, new_size)
-
-var _custom_body: Control:
-	set(value):
-		if _custom_body == value:
-			return
-		if _custom_body:
-			_custom_body_holder.remove_child(_custom_body)
-			_custom_body.queue_free()
-		_custom_body = value
-		if _custom_body:
-			_custom_body_holder.add_child(_custom_body)
-			add_child(_custom_body_holder)
-			move_child(_custom_body_holder, -1)
-		else:
-			remove_child(_custom_body_holder)
-	get:
-		return _custom_body
-
-var _custom_body_holder: MarginContainer:
-	get:
-		if not _custom_body_holder:
-			_custom_body_holder = MarginContainer.new()
-			_custom_body_holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
-			_custom_body_holder.add_theme_constant_override(&'margin_bottom', 12)
-		return _custom_body_holder
-
-var _custom_action: Control:
-	set(value):
-		if _custom_action == value:
-			return
-		var titlebar := get_titlebar_hbox()
-		if _custom_action:
-			titlebar.remove_child(_custom_action)
-			_custom_action.queue_free()
-		_custom_action = value
-		if _custom_action:
-			titlebar.add_child(_custom_action)
-			titlebar.move_child(_custom_action, -1)
-	get:
-		return _custom_action
-
-
-enum _CustomSlot { BODY, ACTION }

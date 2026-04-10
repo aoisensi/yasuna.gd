@@ -19,8 +19,10 @@ func _init(cue: YSNCueBegin, editable: bool) -> void:
 
 	_on_cue_changed()
 
+
 func _on_cue_changed() -> void:
 	text = _cue.begin_name
+
 
 func _on_text_submitted(new_text: String) -> void:
 	if _cue.scenario.has_begin_cue_name(new_text):
@@ -34,12 +36,14 @@ func _on_text_submitted(new_text: String) -> void:
 	undo_redo.add_undo_property(_cue, &'begin_name', _cue.begin_name)
 	undo_redo.commit_action()
 
+
 func _on_text_changed(new_text: String) -> void:
 	if _cue.begin_name != new_text and _cue.scenario.has_begin_cue_name(new_text):
 		var theme := EditorInterface.get_editor_theme()
 		add_theme_color_override(&'font_color', theme.get_color(&'error_color', &'Editor'))
 	else:
 		remove_theme_color_override(&'font_color')
+
 
 func _on_focus_exited() -> void:
 	text_submitted.emit(text)

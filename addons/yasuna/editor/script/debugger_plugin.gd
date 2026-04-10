@@ -3,11 +3,12 @@ extends EditorDebuggerPlugin
 
 const _YSNGraphDebugger = preload('./debugger/ysn_graph_debugger.gd')
 
-var _debuggers: Dictionary[int, _YSNGraphDebugger] = {}
+var _debuggers: Dictionary[int, _YSNGraphDebugger] = { }
 
 
 func _has_capture(capture: String) -> bool:
 	return capture == 'yasuna'
+
 
 func _capture(message: String, data: Array, session_id: int) -> bool:
 	var debugger := _debuggers[session_id]
@@ -25,6 +26,7 @@ func _capture(message: String, data: Array, session_id: int) -> bool:
 		_:
 			return false
 	return true
+
 
 func _setup_session(session_id: int) -> void:
 	var session := get_session(session_id)

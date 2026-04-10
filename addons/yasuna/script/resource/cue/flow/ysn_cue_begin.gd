@@ -1,5 +1,6 @@
 @tool
-class_name YSNCueBegin extends YSNCue
+class_name YSNCueBegin
+extends YSNCue
 
 const EMITTER_START = &'start'
 
@@ -17,20 +18,26 @@ const EMITTER_START = &'start'
 func _received(context: YSNContext) -> void:
 	context.emit_flow(EMITTER_START)
 
+
 func _get_receive_flows() -> Array[StringName]:
 	return []
+
 
 func _get_emit_flows() -> Array[StringName]:
 	return [EMITTER_START]
 
+
 func _get_editor_title() -> StringName:
 	return &'Begin'
+
 
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/flag.svg')
 
+
 func _create_editor_custom_body(parameters: Dictionary) -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_begin_body.gd').new(self, parameters.editable)
+
 
 func _get_editor_node_color() -> Color:
 	return Color.RED

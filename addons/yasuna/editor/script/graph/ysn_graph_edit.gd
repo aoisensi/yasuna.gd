@@ -4,18 +4,13 @@ extends GraphEdit
 const _YSNGraphNode := preload('./ysn_graph_node.gd')
 const _YSNGraphPopup := preload('./ysn_graph_popup.gd')
 
-
-var _scenario: YSNScenario
 var scenario: YSNScenario:
 	get:
 		return _scenario
-
+var _scenario: YSNScenario
 var _title: LineEdit
-
-var _cue_nodes: Dictionary[int, _YSNGraphNode] = {}
-
+var _cue_nodes: Dictionary[int, _YSNGraphNode] = { }
 var _undo_redo := EditorInterface.get_editor_undo_redo()
-
 var _debugger: Object
 
 
@@ -38,13 +33,16 @@ func _init(scenario: YSNScenario, debugger: Object = null) -> void:
 
 	_setup_toolbox(debugger)
 
+
 func _ready() -> void:
 	_on_scenario_changed()
+
 
 func save() -> void:
 	if scenario.resource_path:
 		ResourceSaver.save(scenario)
 		scenario.emit_changed()
+
 
 func _on_scenario_changed() -> void:
 	var cue_list := scenario.get_cue_list()
@@ -64,8 +62,10 @@ func _on_scenario_changed() -> void:
 	if not _title.is_editing():
 		_title.text = scenario.title
 
+
 func _get_cue_node(id: int) -> _YSNGraphNode:
 	return _cue_nodes.get(id)
+
 
 func _create_cue_node(id: int) -> _YSNGraphNode:
 	var cue := scenario.get_cue(id)
@@ -77,11 +77,13 @@ func _create_cue_node(id: int) -> _YSNGraphNode:
 	_cue_nodes[id] = node
 	return node
 
+
 func _remove_cue_node(id: int) -> void:
 	var node := _cue_nodes[id]
 	remove_child(node)
 	node.queue_free()
 	_cue_nodes.erase(id)
+
 
 func _on_connection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int, is_connect: bool) -> void:
 	var from := get_node(String(from_node)) as _YSNGraphNode
@@ -98,6 +100,7 @@ func _on_connection_request(from_node: StringName, from_port: int, to_node: Stri
 		_disconnect_nodes(emitter_id, emit_flow, receiver_id, receive_flow)
 	_undo_redo.commit_action()
 
+
 func _on_delete_node_request(names: Array[StringName]) -> void:
 	_undo_redo.create_action('Delete Scenario Cues', UndoRedo.MERGE_DISABLE, null, true)
 	var ids := PackedInt32Array()
@@ -107,9 +110,11 @@ func _on_delete_node_request(names: Array[StringName]) -> void:
 	_delete_nodes(ids)
 	_undo_redo.commit_action()
 
+
 func _on_node_selected(node: Node) -> void:
 	if node is _YSNGraphNode:
 		EditorInterface.edit_resource(node._cue)
+
 
 func _on_popup_request(at_position: Vector2) -> void:
 	var popup := _YSNGraphPopup.new(self)
@@ -117,6 +122,7 @@ func _on_popup_request(at_position: Vector2) -> void:
 	add_child(popup)
 	popup.popup_on_parent(Rect2(at_position + global_position, Vector2.ZERO))
 	popup.spawn_position = at_position + scroll_offset
+
 
 func _setup_toolbox(debugger: Object) -> void:
 	var hbox := get_menu_hbox()
@@ -130,6 +136,7 @@ func _setup_toolbox(debugger: Object) -> void:
 	hbox.add_child(_title)
 	hbox.move_child(_title, 0)
 
+
 func _create_cue(script: Script, position := Vector2.ZERO) -> void:
 	var cue_id := scenario.get_valid_cue_id()
 	var cue := script.new() as YSNCue
@@ -137,6 +144,7 @@ func _create_cue(script: Script, position := Vector2.ZERO) -> void:
 	_undo_redo.add_do_method(scenario, &'add_cue', cue, cue_id, position)
 	_undo_redo.add_undo_method(scenario, &'remove_cue', cue_id)
 	_undo_redo.commit_action()
+
 
 func _delete_nodes(ids: PackedInt32Array) -> void:
 	var connections := scenario.get_cue_connections()
@@ -161,18 +169,22 @@ func _delete_nodes(ids: PackedInt32Array) -> void:
 		_undo_redo.add_do_method(scenario, &'remove_cue', id)
 		_undo_redo.add_undo_method(scenario, &'add_cue', cue, id, position)
 
+
 func _connect_nodes(emitter_id: int, emit_flow: StringName, receiver_id: int, receive_flow: StringName) -> void:
 	_undo_redo.add_do_method(scenario, &'connect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
 	_undo_redo.add_undo_method(scenario, &'disconnect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
+
 
 func _disconnect_nodes(emitter_id: int, emit_flow: StringName, receiver_id: int, receive_flow: StringName) -> void:
 	_undo_redo.add_do_method(scenario, &'disconnect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
 	_undo_redo.add_undo_method(scenario, &'connect_cues', emitter_id, emit_flow, receiver_id, receive_flow)
 
+
 func _on_debugger_flow_emitted(cue_id: int, emit_flow: StringName) -> void:
 	var tween := create_tween()
 	tween.tween_method(_change_node_flow_color.bind(cue_id, emit_flow), Color.GREEN, Color.WHITE, 0.25)
 	tween.play()
+
 
 func _change_node_flow_color(color: Color, cue_id: int, emit_flow: StringName) -> void:
 	var node := _cue_nodes[cue_id]
@@ -190,12 +202,14 @@ func _change_node_flow_color(color: Color, cue_id: int, emit_flow: StringName) -
 			continue
 		cnode.set_slot_color_left(cslot, color)
 
+
 func _on_title_text_submitted(new_text: String) -> void:
 	var old_text := scenario.title
 	_undo_redo.create_action('Change Scenario Title', UndoRedo.MERGE_ENDS)
 	_undo_redo.add_do_property(scenario, &'title', new_text)
 	_undo_redo.add_undo_property(scenario, &'title', old_text)
 	_undo_redo.commit_action()
+
 
 func _on_title_focus_exited() -> void:
 	_title.text_submitted.emit(_title.text)

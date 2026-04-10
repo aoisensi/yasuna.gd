@@ -1,9 +1,6 @@
 @tool
 extends Tree
 
-var _items: Dictionary[YSNScenario, TreeItem] = {}
-var _root: TreeItem
-
 signal scenario_activated(scenario: YSNScenario)
 signal scenario_closed(scenario: YSNScenario)
 
@@ -11,13 +8,17 @@ const _COLUMN_TITLE = 0
 const _COLUMN_CLOSE = 1
 const _BUTTON_ID_CLOSE = 4
 
+var _items: Dictionary[YSNScenario, TreeItem] = { }
+var _root: TreeItem
+
 
 func _init() -> void:
 	_root = create_item()
-	
+
 	hide_root = true
 	item_activated.connect(_on_item_activated)
 	button_clicked.connect(_on_button_clicked)
+
 
 func add(scenario: YSNScenario) -> void:
 	var item := _items.get(scenario)
@@ -27,10 +28,12 @@ func add(scenario: YSNScenario) -> void:
 	set_selected(item, 0)
 	item_activated.emit()
 
+
 func _on_item_activated() -> void:
 	var scenario := get_selected().get_meta(&'scenario')
 	if scenario:
 		scenario_activated.emit(scenario)
+
 
 func _on_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index: int) -> void:
 	var scenario: YSNScenario = item.get_meta(&'scenario')
@@ -40,6 +43,7 @@ func _on_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index
 			item.get_parent().remove_child(item)
 			scenario.changed.disconnect(_on_scenario_changed)
 			scenario_closed.emit(scenario)
+
 
 func _create_item(scenario: YSNScenario) -> TreeItem:
 	var item := create_item(_root)
@@ -53,6 +57,7 @@ func _create_item(scenario: YSNScenario) -> TreeItem:
 	item.add_button(0, close_icon, _BUTTON_ID_CLOSE)
 
 	return item
+
 
 func _on_scenario_changed(scenario: YSNScenario) -> void:
 	var item: TreeItem = _items.get(scenario)

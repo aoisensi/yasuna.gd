@@ -1,6 +1,7 @@
 @tool
 @abstract
-class_name YSNCueReactive extends YSNCueStateful
+class_name YSNCueReactive
+extends YSNCueStateful
 
 const RECEIVE_FLOW_RESET = &'reset'
 const EMIT_FLOW_DONE = &'done'
@@ -14,14 +15,18 @@ func _received(context: YSNContext) -> void:
 	assert(state is YSNCueReactive.State)
 	state._received(context)
 
+
 func _get_receive_flows() -> Array[StringName]:
 	return [RECEIVE_FLOW_RESET]
+
 
 func _is_ephemeral() -> bool:
 	return true
 
+
 func _get_editor_node_color() -> Color:
 	return Color.YELLOW
+
 
 func _get_number_flows(n: int) -> Array[StringName]:
 	var result: Array[StringName] = []
@@ -33,9 +38,8 @@ func _get_number_flows(n: int) -> Array[StringName]:
 
 @abstract
 class State extends YSNCueStateful.State:
-
 	func _received(context: YSNContext) -> void:
 		_evaluate(context)
 
-	@abstract
-	func _evaluate(context: YSNContext) -> void
+
+	@abstract func _evaluate(context: YSNContext) -> void

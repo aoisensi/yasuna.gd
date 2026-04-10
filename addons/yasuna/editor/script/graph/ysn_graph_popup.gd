@@ -2,12 +2,10 @@ extends PopupMenu
 
 const _YSNGraphEdit = preload('./ysn_graph_edit.gd')
 
-var _graph_edit: _YSNGraphEdit
-var _scripts: Dictionary[int, Script] = {}
-
-var _undo_redo := EditorInterface.get_editor_undo_redo()
-
 var spawn_position: Vector2
+var _graph_edit: _YSNGraphEdit
+var _scripts: Dictionary[int, Script] = { }
+var _undo_redo := EditorInterface.get_editor_undo_redo()
 
 
 func _init(graph_edit: _YSNGraphEdit) -> void:
@@ -16,13 +14,16 @@ func _init(graph_edit: _YSNGraphEdit) -> void:
 	ProjectSettings.settings_changed.connect(_on_project_settings_settings_changed)
 	id_pressed.connect(_on_id_pressed)
 
+
 func _ready() -> void:
 	_on_project_settings_settings_changed()
+
 
 func _on_id_pressed(id: int) -> void:
 	var scenario := _graph_edit.scenario
 	var script := _scripts[id]
 	_graph_edit._create_cue(script, spawn_position)
+
 
 func _on_project_settings_settings_changed() -> void:
 	clear(true)
@@ -40,7 +41,7 @@ func _on_project_settings_settings_changed() -> void:
 			continue
 		add_item(clazz[&'class'], id)
 		_scripts[id] = script
-		
+
 
 func _is_cue_script(script: Script) -> bool:
 	if script.is_abstract():
@@ -50,6 +51,7 @@ func _is_cue_script(script: Script) -> bool:
 	if not script.can_instantiate():
 		return false
 	return _is_cue_script_recursion(script)
+
 
 func _is_cue_script_recursion(script: Script) -> bool:
 	if not script:

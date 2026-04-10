@@ -14,6 +14,7 @@ func _init(cue: YSNCue, property: StringName) -> void:
 	var theme := EditorInterface.get_editor_theme()
 	theme.changed.connect(_on_editor_theme_changed)
 
+
 func _add_button(icon: Texture2D, n: int) -> void:
 	var button := TextureButton.new()
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -22,8 +23,10 @@ func _add_button(icon: Texture2D, n: int) -> void:
 	button.pressed.connect(_on_button_pressed.bind(n))
 	add_child(button)
 
+
 func _on_button_pressed(n: int) -> void:
 	_cue.set(_property, _cue.get(_property) + n)
+
 
 func _on_editor_theme_changed(button: TextureButton) -> void:
 	var theme := EditorInterface.get_editor_theme()

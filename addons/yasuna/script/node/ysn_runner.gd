@@ -1,29 +1,29 @@
-class_name YSNRunner extends Node
-
-@export var auto_acts: Array[YSNRunnerAutoAct] = []
-
-var _instances: Dictionary[int, YSNInstance] = {}
+class_name YSNRunner
+extends Node
 
 signal completed(scenario: YSNScenario)
 signal aborted(scenario: YSNScenario)
 signal closed(scenario: YSNScenario)
+
+@export var auto_acts: Array[YSNRunnerAutoAct] = []
+
+var _instances: Dictionary[int, YSNInstance] = { }
 
 
 func _enter_tree() -> void:
 	if EngineDebugger.is_active():
 		EngineDebugger.send_message('yasuna:runner_entered', [get_instance_id(), get_path()])
 
-func _exit_tree() -> void:
-	if EngineDebugger.is_active():
-		EngineDebugger.send_message('yasuna:runner_exited', [get_instance_id()])
 
 func _ready() -> void:
 	if auto_acts:
 		_auto_acts.call_deferred()
 
-func _auto_acts() -> void:
-	for a in auto_acts:
-		act(a.scenario, a.begin_name)
+
+func _exit_tree() -> void:
+	if EngineDebugger.is_active():
+		EngineDebugger.send_message('yasuna:runner_exited', [get_instance_id()])
+
 
 func act(scenario: YSNScenario, begin_name := &'main') -> YSNInstance:
 	var sid := _get_valid_sid()
@@ -36,13 +36,15 @@ func act(scenario: YSNScenario, begin_name := &'main') -> YSNInstance:
 		EngineDebugger.send_message('yasuna:instance_started', [instance.get_instance_id(), get_instance_id(), scenario.resource_path])
 	return instance
 
+
 func capture() -> Dictionary:
-	var instances: Dictionary = {}
-	var result: Dictionary = {instances = instances}
+	var instances: Dictionary = { }
+	var result: Dictionary = { instances = instances }
 	for sid in _instances:
 		var instance := _instances[sid]
 		instances[str(sid)] = instance._capture()
 	return result
+
 
 func restore(data: Dictionary) -> Array[YSNInstance]:
 	var instances: Dictionary = data.instances
@@ -67,10 +69,17 @@ func restore(data: Dictionary) -> Array[YSNInstance]:
 
 	return result
 
+
 func abort_all() -> void:
 	for sid in _instances:
 		var instance := _instances[sid]
 		instance.abort()
+
+
+func _auto_acts() -> void:
+	for a in auto_acts:
+		act(a.scenario, a.begin_name)
+
 
 func _close_instance(instance: YSNInstance) -> void:
 	var scenario = instance.scenario
@@ -78,6 +87,7 @@ func _close_instance(instance: YSNInstance) -> void:
 		EngineDebugger.send_message('yasuna:instance_closed', [instance.get_instance_id()])
 	_instances.erase(instance.sid)
 	closed.emit(scenario)
+
 
 func _get_valid_sid() -> int:
 	var id := 0

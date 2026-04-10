@@ -1,5 +1,6 @@
 @tool
-class_name YSNCueSubScenarioAsync extends YSNCueAsync
+class_name YSNCueSubScenarioAsync
+extends YSNCueAsync
 
 @export var sub_scenario: YSNScenario:
 	set(value):
@@ -8,7 +9,6 @@ class_name YSNCueSubScenarioAsync extends YSNCueAsync
 			emit_changed()
 	get:
 		return sub_scenario
-
 @export var begin_name := &'main':
 	set(value):
 		if begin_name != value:
@@ -21,19 +21,22 @@ class_name YSNCueSubScenarioAsync extends YSNCueAsync
 func _get_state_class() -> Script:
 	return State
 
+
 func _get_editor_title() -> StringName:
 	return &'Sub Scenario Async'
 
+
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/file-time.svg')
+
 
 func _create_editor_custom_body(parameters: Dictionary) -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_scenario_body.gd').new(self, parameters.editable, &'sub_scenario')
 
 
 class State extends YSNCueAsync.State:
-
 	var sid: int
+
 
 	func _perform(context: YSNContext) -> void:
 		var cue := context.cue as YSNCueSubScenarioAsync
@@ -43,8 +46,10 @@ class State extends YSNCueAsync.State:
 			await instance.finished
 		complete(context)
 
+
 	func _capture() -> Dictionary:
-		return {sid = sid}
+		return { sid = sid }
+
 
 	func _restore(context: YSNContext, data: Dictionary) -> void:
 		sid = data.sid

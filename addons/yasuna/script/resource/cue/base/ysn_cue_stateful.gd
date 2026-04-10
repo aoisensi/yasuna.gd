@@ -1,9 +1,12 @@
 @tool
 @abstract
-class_name YSNCueStateful extends YSNCue
+class_name YSNCueStateful
+extends YSNCue
+
 
 @abstract
 func _get_state_class() -> Script
+
 
 # If true, the instance will be automatically destroyed even if this state exists.
 func _is_ephemeral() -> bool:
@@ -12,7 +15,6 @@ func _is_ephemeral() -> bool:
 
 @abstract
 class State extends RefCounted:
-
 	var _cue_id: int
 	var cue_id:
 		get:
@@ -27,17 +29,19 @@ class State extends RefCounted:
 		get:
 			return _instance
 
+
 	func _setup(context: YSNContext) -> void:
 		pass
 
-	@abstract
-	func _received(context: YSNContext) -> void
 
-	@abstract
-	func _capture() -> Dictionary
+	@abstract func _received(context: YSNContext) -> void
 
-	@abstract
-	func _restore(context: YSNContext, data: Dictionary) -> void
+
+	@abstract func _capture() -> Dictionary
+
+
+	@abstract func _restore(context: YSNContext, data: Dictionary) -> void
+
 
 	func _destroy() -> void:
 		pass

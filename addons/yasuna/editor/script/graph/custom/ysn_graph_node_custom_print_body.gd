@@ -13,11 +13,14 @@ func _init(cue: YSNCuePrint, editable: bool) -> void:
 	custom_minimum_size = Vector2(240.0, 60.0)
 	text_changed.connect(_on_text_changed)
 
+
 func _ready() -> void:
 	_on_cue_changed()
 
+
 func _on_text_changed() -> void:
 	_cue.message = text
+
 
 func _on_cue_changed() -> void:
 	if text != _cue.message:

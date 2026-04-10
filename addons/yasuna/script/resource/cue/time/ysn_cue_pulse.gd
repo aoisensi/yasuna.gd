@@ -1,9 +1,9 @@
 @tool
-class_name YSNCuePulse extends YSNCueReactive
+class_name YSNCuePulse
+extends YSNCueReactive
 
 const RECEIVE_FLOW_START = &'start'
 const EMIT_FLOW_PULSED = &'pulsed'
-
 
 @export var time_sec := 1.0:
 	set(value):
@@ -12,7 +12,6 @@ const EMIT_FLOW_PULSED = &'pulsed'
 			emit_changed()
 	get:
 		return time_sec
-
 @export var process_always := false
 @export var process_in_physics := true
 @export var ignore_time_scale := false
@@ -21,30 +20,36 @@ const EMIT_FLOW_PULSED = &'pulsed'
 func _get_emit_flows() -> Array[StringName]:
 	return [EMIT_FLOW_PULSED]
 
+
 func _get_receive_flows() -> Array[StringName]:
 	var flows: Array[StringName] = [RECEIVE_FLOW_START]
 	flows.append_array(super._get_receive_flows())
 	return flows
 
+
 func _get_state_class() -> Script:
 	return State
+
 
 func _is_ephemeral() -> bool:
 	return false
 
+
 func _get_editor_title() -> StringName:
 	return &'Pulse'
 
+
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/bolt.svg')
+
 
 func _create_editor_custom_body(parameters: Dictionary) -> Control:
 	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_pulse_body.gd').new(self, parameters.editable)
 
 
 class State extends YSNCueReactive.State:
-
 	var _timer: Timer
+
 
 	func _evaluate(context: YSNContext) -> void:
 		var cue := context.cue as YSNCuePulse
@@ -57,6 +62,7 @@ class State extends YSNCueReactive.State:
 			RECEIVE_FLOW_RESET:
 				_destroy()
 
+
 	func _create_timer(context: YSNContext) -> void:
 		var cue := context.cue as YSNCuePulse
 		_timer = Timer.new()
@@ -67,14 +73,17 @@ class State extends YSNCueReactive.State:
 		_timer.ignore_time_scale = cue.ignore_time_scale
 		_timer.timeout.connect(_pulsed.bind(context))
 
+
 	func _pulsed(context: YSNContext) -> void:
 		context.emit_flow(EMIT_FLOW_PULSED)
 
+
 	func _capture() -> Dictionary:
 		if _timer:
-			return {time_left = _timer.time_left, running = true}
+			return { time_left = _timer.time_left, running = true }
 		else:
-			return {running = false}
+			return { running = false }
+
 
 	func _restore(context: YSNContext, data: Dictionary) -> void:
 		if data.running:
@@ -82,6 +91,7 @@ class State extends YSNCueReactive.State:
 			await context.runner.get_tree().create_timer(data.time_left, cue.process_always, cue.process_in_physics, cue.ignore_time_scale).timeout
 			_create_timer(context)
 			_timer.start()
+
 
 	func _destroy() -> void:
 		if _timer:

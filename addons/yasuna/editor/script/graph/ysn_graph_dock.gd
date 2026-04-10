@@ -5,14 +5,10 @@ const _YSNGraphList := preload('./ysn_graph_list.gd')
 const _YSNGraphEdit := preload('./ysn_graph_edit.gd')
 
 var _split: HSplitContainer
-
 var _empty: Control
 var _graph_list: _YSNGraphList
 var _graph_edit: _YSNGraphEdit
 
-
-func save() -> void:
-	_graph_edit.save()
 
 func _init() -> void:
 	_empty = Control.new()
@@ -25,8 +21,14 @@ func _init() -> void:
 	_graph_list.scenario_activated.connect(_on_graph_list_scenario_activated)
 	_graph_list.scenario_closed.connect(_on_graph_list_scenario_closed)
 
+
+func save() -> void:
+	_graph_edit.save()
+
+
 func edit(scenario: YSNScenario) -> void:
 	_graph_list.add(scenario)
+
 
 func _on_graph_list_scenario_activated(scenario: YSNScenario) -> void:
 	if not scenario:
@@ -43,6 +45,7 @@ func _on_graph_list_scenario_activated(scenario: YSNScenario) -> void:
 	_split.add_child(_graph_edit)
 	_split.move_child(_graph_edit, 1)
 
+
 func _on_graph_list_scenario_closed(scenario: YSNScenario) -> void:
 	if not scenario:
 		return
@@ -53,6 +56,7 @@ func _on_graph_list_scenario_closed(scenario: YSNScenario) -> void:
 			_graph_edit.queue_free()
 			_graph_edit = null
 			_split.add_child(_empty)
+
 
 func _on_plugin_resource_saved(resource: Resource) -> void:
 	if resource is YSNScenario:

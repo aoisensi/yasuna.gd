@@ -6,17 +6,22 @@ const WAIT_MARGIN := 50
 func test_wait_0_0() -> void:
 	await _test_wait(0.0)
 
+
 func test_wait_0_2() -> void:
 	await _test_wait(0.2)
 
+
 func test_wait_0_5() -> void:
 	await _test_wait(0.5)
-	
+
+
 func test_wait_1_0() -> void:
 	await _test_wait(1.0)
 
+
 func test_wait_5_0() -> void:
 	await _test_wait(5.0)
+
 
 func test_fuzzer_wait_restore(fuzzer_wait := Fuzzers.rangei(1000, 4000), _fuzzer_iterations := 5) -> void:
 	var scenario := load_scenario('scenario/wait_5.0.sc.tres')
@@ -36,6 +41,7 @@ func test_fuzzer_wait_restore(fuzzer_wait := Fuzzers.rangei(1000, 4000), _fuzzer
 	@warning_ignore('redundant_await')
 	await assert_signal(monitor_after).wait_until(WAIT_MARGIN * 2).is_emitted(monitor_after.completed)
 	assert_bool(instance_after.is_closed).is_true()
+
 
 func _test_wait(sec: float) -> void:
 	var scenario := load_scenario('scenario/wait_%.1f.sc.tres' % sec)

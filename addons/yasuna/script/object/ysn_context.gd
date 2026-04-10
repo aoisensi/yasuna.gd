@@ -1,38 +1,35 @@
-class_name YSNContext extends RefCounted
+class_name YSNContext
+extends RefCounted
 
-# cue_id
-var _id: int
 var id: int:
 	get:
 		return _id
-
-var _instance: YSNInstance
 var instance: YSNInstance:
 	get:
 		return _instance
-
 var scenario: YSNScenario:
 	get:
 		return _instance.scenario
-
 var cue: YSNCue:
 	get:
 		return scenario.get_cue(id)
-
-var _flow: StringName
 var flow: StringName:
 	get:
 		return _flow
-
 var runner: YSNRunner:
 	get:
 		return instance.runner
+# cue_id
+var _id: int
+var _instance: YSNInstance
+var _flow: StringName
 
 
 func _init(instance: YSNInstance, id: int, flow: StringName) -> void:
 	_instance = instance
 	_id = id
 	_flow = flow
+
 
 func emit_flow(flow: StringName) -> void:
 	if instance._canceling:
@@ -45,14 +42,17 @@ func emit_flow(flow: StringName) -> void:
 		instance._queue_emit(connected.cue, connected.flow)
 	instance._run()
 
+
 func _create_state() -> YSNCueStateful.State:
 	assert(cue is YSNCueStateful)
 	var state = instance._create_state(cue)
 	state._setup(self)
 	return state
 
+
 func _get_state() -> YSNCueStateful.State:
 	return instance._get_states(cue).front()
+
 
 func _get_or_create_state() -> YSNCueStateful.State:
 	assert(cue is YSNCueStateful)
@@ -63,10 +63,12 @@ func _get_or_create_state() -> YSNCueStateful.State:
 		return states.front()
 	return _create_state()
 
+
 func _remove_states() -> void:
 	for state in instance._get_states(cue):
 		state._destroy()
 	instance._remove_states(cue)
+
 
 func _remove_state(state: YSNCueStateful.State) -> void:
 	state._destroy()

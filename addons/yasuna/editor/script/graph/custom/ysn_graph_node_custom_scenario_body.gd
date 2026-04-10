@@ -5,7 +5,6 @@ var _property: StringName
 
 
 func _init(cue: YSNCue, editable: bool, property: StringName) -> void:
-
 	custom_minimum_size = Vector2(240.0, 0.0)
 
 	_cue = cue
@@ -19,8 +18,10 @@ func _init(cue: YSNCue, editable: bool, property: StringName) -> void:
 
 	_on_cue_changed()
 
+
 func _on_cue_changed() -> void:
 	edited_resource = _cue.get(_property)
+
 
 func _on_resource_selected(resource: Resource, inspect: bool) -> void:
 	_cue.set(_property, resource)
