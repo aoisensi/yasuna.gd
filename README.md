@@ -2,7 +2,7 @@
 
 Graph-based stateful scenario addon for Godot 4.
 
-**English** | [日本語](/docs/README.ja.md)
+🌐 **English** | [日本語](/docs/README.ja.md)
 
 **yasuna** is an addon for building scenario flows by combining cues.  
 It is designed to preserve the state of asynchronous actions during execution, allowing save and load at any point during gameplay.  
@@ -19,7 +19,12 @@ Rather than providing built-in features for specific games, it is intended to le
 - Easy addition of custom cues that implement game-specific logic
 - Scenario / flow management through a graph editor similar to `VisualShader`
 - A stateful design that allows saving and loading state at any point during execution
+- A visual debugger that shows scenario flow execution in real time
 - Written in pure GDScript
+
+## Documentation
+
+- [Architecture Overview](docs/ARCHITECTURE.md)
 
 ## License
 
