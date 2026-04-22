@@ -3,6 +3,7 @@ extends GraphEdit
 
 const _YSNGraphNode := preload('./ysn_graph_node.gd')
 const _YSNGraphPopup := preload('./ysn_graph_popup.gd')
+const _YSNGraphDebuggerContext := preload('../debugger/ysn_graph_debugger_context.gd')
 
 var scenario: YSNScenario:
 	get:
@@ -11,10 +12,10 @@ var _scenario: YSNScenario
 var _title: LineEdit
 var _cue_nodes: Dictionary[int, _YSNGraphNode] = { }
 var _undo_redo := EditorInterface.get_editor_undo_redo()
-var _debugger: Object
+var _debugger: _YSNGraphDebuggerContext
 
 
-func _init(scenario: YSNScenario, debugger: Object = null) -> void:
+func _init(scenario: YSNScenario, debugger: _YSNGraphDebuggerContext = null) -> void:
 	_scenario = scenario
 	_debugger = debugger
 
@@ -26,12 +27,12 @@ func _init(scenario: YSNScenario, debugger: Object = null) -> void:
 		connection_request.connect(_on_connection_request.bind(true))
 		disconnection_request.connect(_on_connection_request.bind(false))
 	else:
-		debugger.connect(&'flow_emitted', _on_debugger_flow_emitted)
+		debugger.debugger.connect(&'flow_emitted', _on_debugger_flow_emitted)
 
 	node_selected.connect(_on_node_selected)
 	_scenario.changed.connect(_on_scenario_changed)
 
-	_setup_toolbox(debugger)
+	_setup_toolbox()
 
 
 func _ready() -> void:
@@ -124,10 +125,10 @@ func _on_popup_request(at_position: Vector2) -> void:
 	popup.spawn_position = at_position + scroll_offset
 
 
-func _setup_toolbox(debugger: Object) -> void:
+func _setup_toolbox() -> void:
 	var hbox := get_menu_hbox()
 	_title = LineEdit.new()
-	_title.editable = not debugger
+	_title.editable = not _debugger
 	_title.custom_minimum_size = Vector2(240.0, 0.0)
 	_title.placeholder_text = 'Title'
 	_title.focus_exited.connect(_on_title_focus_exited)

@@ -36,12 +36,14 @@ func _get_editor_title() -> StringName:
 	return &'Every'
 
 
-func _create_editor_custom_action(parameters: Dictionary) -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'flows')
-
-
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/list-check.svg')
+
+
+func _get_editor_graph_extensions() -> Array[RefCounted]:
+	return [
+		load('res://addons/yasuna/editor/script/graph/extension/ysn_graph_node_extension_steps.gd').new(&'flows'),
+	]
 
 
 class State extends YSNCueReactive.State:

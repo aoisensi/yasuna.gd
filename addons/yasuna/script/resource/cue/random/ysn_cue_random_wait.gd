@@ -2,15 +2,19 @@
 class_name YSNCueRandomWait
 extends YSNCueWait
 
-@export var min_sec := 1.0:
+@export_range(0.0, 10.0, 0.01, 'suffix:s', 'or_greater') var min_sec := 1.0:
 	set(value):
-		min_sec = max(0.0, value)
+		if value < 0.0 or min_sec == value:
+			return
+		min_sec = clamp(value, 0.0, max_sec)
 		emit_changed()
 	get:
 		return min_sec
-@export var max_sec := 3.0:
+@export_range(0.0, 10.0, 0.01, 'suffix:s', 'or_greater') var max_sec := 3.0:
 	set(value):
-		max_sec = max(0.0, value)
+		if value < 0.0 or max_sec == value:
+			return
+		max_sec = max(min_sec, value)
 		emit_changed()
 	get:
 		return max_sec
@@ -33,5 +37,5 @@ func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/beach.svg')
 
 
-func _create_editor_custom_body(parameters: Dictionary) -> Control:
-	return null
+func _get_editor_graph_properties() -> PackedStringArray:
+	return ['min_sec', 'max_sec']

@@ -5,6 +5,7 @@ signal flow_emitted(cue_id: int, emit_flow: StringName) # TODO: maybe bad
 
 const _YSNGraphDebuggerTree = preload('./ysn_graph_debugger_tree.gd')
 const _YSNGraphEdit = preload('../graph/ysn_graph_edit.gd')
+const _YSNGraphDebuggerContext = preload('./ysn_graph_debugger_context.gd')
 
 var _tree: _YSNGraphDebuggerTree
 var _edit: _YSNGraphEdit
@@ -30,7 +31,7 @@ func _on_tree_instance_activated(instance_id: int) -> void:
 	_active_instance_id = instance_id
 	var scenario_path := _instances[instance_id]
 	var scenario := load(scenario_path) as YSNScenario
-	_create_edit(scenario)
+	_create_edit(scenario, instance_id)
 
 
 func _create_tree() -> void:
@@ -43,11 +44,14 @@ func _create_tree() -> void:
 	move_child(_tree, 0)
 
 
-func _create_edit(scenario: YSNScenario) -> void:
+func _create_edit(scenario: YSNScenario, instance_id: int) -> void:
 	if _edit:
 		remove_child(_edit)
 		_edit.queue_free()
-	_edit = _YSNGraphEdit.new(scenario, self)
+	var context := _YSNGraphDebuggerContext.new()
+	context.debugger = self
+	context.instance_id = instance_id
+	_edit = _YSNGraphEdit.new(scenario, context)
 	add_child(_edit)
 	move_child(_edit, 1)
 
@@ -73,3 +77,7 @@ func _instance_closed(instance_id: int) -> void:
 func _cue_flow_emitted(instance_id: int, cue_id: int, emit_flow: StringName) -> void:
 	if instance_id == _active_instance_id:
 		flow_emitted.emit(cue_id, emit_flow)
+
+
+func _emit_cue_flow(instance_id: int, cue_id: int, emit_flow: StringName) -> void:
+	_session.send_message('yasuna:cue_flow_emit', [instance_id, cue_id, emit_flow])

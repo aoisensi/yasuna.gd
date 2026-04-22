@@ -39,16 +39,16 @@ func _get_editor_title() -> StringName:
 	return get_script().get_global_name()
 
 
+func _get_editor_graph_properties() -> PackedStringArray:
+	return []
+
+
 func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/circle.svg')
 
 
-func _create_editor_custom_body(parameters: Dictionary) -> Control:
-	return null
-
-
-func _create_editor_custom_action(parameters: Dictionary) -> Control:
-	return null
+func _get_editor_graph_extensions() -> Array[RefCounted]:
+	return []
 
 
 func _is_editor_node_resizable() -> bool:

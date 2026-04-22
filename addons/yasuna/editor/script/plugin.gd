@@ -1,7 +1,7 @@
 @tool
 extends EditorPlugin
 
-const _YSNDebuggerPlugin = preload('./debugger_plugin.gd')
+const _YSNDebuggerPlugin = preload('./ysn_debugger_plugin.gd')
 const _YSNGraphDock = preload('./graph/ysn_graph_dock.gd')
 
 var _debugger: _YSNDebuggerPlugin

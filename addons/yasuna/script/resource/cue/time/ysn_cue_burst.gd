@@ -4,19 +4,7 @@ extends YSNCueAsync
 
 const EMIT_FLOW_BURSTED = &'bursted'
 
-@export var time_sec := 1.0:
-	set(value):
-		if time_sec != value:
-			time_sec = value
-			emit_changed()
-	get:
-		return time_sec
-@export var process_always := false
-@export var process_in_physics := true
-@export var ignore_time_scale := false
-
-@export_range(1, 100)
-var count := 3:
+@export_range(1, 100, 1, 'suffix:times', 'or_greater') var count := 3:
 	set(value):
 		value = maxi(1, value)
 		if count != value:
@@ -24,6 +12,17 @@ var count := 3:
 			emit_changed()
 	get:
 		return count
+@export_range(0.0, 10.0, 0.01, 'suffix:s', 'or_greater') var time_sec := 1.0:
+	set(value):
+		if value < 0.0 or time_sec == value:
+			return
+		time_sec = value
+		emit_changed()
+	get:
+		return time_sec
+@export var process_always := false
+@export var process_in_physics := true
+@export var ignore_time_scale := false
 
 
 func _get_emit_flows() -> Array[StringName]:
@@ -44,8 +43,8 @@ func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/dots.svg')
 
 
-func _create_editor_custom_body(parameters: Dictionary) -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_burst_body.gd').new(self)
+func _get_editor_graph_properties() -> PackedStringArray:
+	return ['count', 'time_sec']
 
 
 class State extends YSNCueAsync.State:

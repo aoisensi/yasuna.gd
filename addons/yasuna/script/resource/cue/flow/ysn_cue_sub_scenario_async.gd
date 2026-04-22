@@ -30,10 +30,7 @@ func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/file-time.svg')
 
 
-func _create_editor_custom_body(parameters: Dictionary) -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_scenario_body.gd').new(self, parameters.editable, &'sub_scenario')
-
-
+# TODO
 class State extends YSNCueAsync.State:
 	var sid: int
 

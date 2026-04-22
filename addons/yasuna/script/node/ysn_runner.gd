@@ -13,6 +13,7 @@ var _instances: Dictionary[int, YSNInstance] = { }
 func _enter_tree() -> void:
 	if EngineDebugger.is_active():
 		EngineDebugger.send_message('yasuna:runner_entered', [get_instance_id(), get_path()])
+		EngineDebugger.register_message_capture('yasuna', _debugger_message_captured)
 
 
 func _ready() -> void:
@@ -99,3 +100,21 @@ func _get_valid_sid() -> int:
 			break
 		# ultra jackpot
 	return id
+
+
+func _debugger_message_captured(message: String, data: Array) -> bool:
+	match message:
+		'cue_flow_emit':
+			return _debug_cue_flow_emitted(data[0], data[1], data[2])
+	return false
+
+
+func _debug_cue_flow_emitted(instance_id: int, cue_id: int, emit_flow: StringName) -> bool:
+	for i in _instances.values():
+		var instance := i as YSNInstance
+		if instance.get_instance_id() != instance_id:
+			continue
+		var context := YSNContext.new(instance, cue_id, &'')
+		context.emit_flow(emit_flow)
+		return true
+	return false

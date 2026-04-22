@@ -4,13 +4,12 @@ extends YSNCue
 
 const EMITTER_START = &'start'
 
-@export var begin_name: StringName:
+@export var begin_name := &'main':
 	set(value):
 		if begin_name == value:
 			return
-		if not scenario or not scenario.has_begin_cue_name(value) or not value: # empty is allowed but disabled
-			begin_name = value
-			emit_changed()
+		begin_name = value
+		emit_changed()
 	get:
 		return begin_name
 
@@ -35,8 +34,8 @@ func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/flag.svg')
 
 
-func _create_editor_custom_body(parameters: Dictionary) -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_begin_body.gd').new(self, parameters.editable)
+func _get_editor_graph_properties() -> PackedStringArray:
+	return ['begin_name']
 
 
 func _get_editor_node_color() -> Color:

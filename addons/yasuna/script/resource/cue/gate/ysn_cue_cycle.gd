@@ -38,8 +38,10 @@ func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/analyze.svg')
 
 
-func _create_editor_custom_action(parameters: Dictionary) -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'count')
+func _get_editor_graph_extensions() -> Array[RefCounted]:
+	return [
+		load('res://addons/yasuna/editor/script/graph/extension/ysn_graph_node_extension_steps.gd').new(&'count'),
+	]
 
 
 class State extends YSNCueReactive.State:

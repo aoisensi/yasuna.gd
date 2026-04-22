@@ -4,6 +4,14 @@ extends YSNCueReactive
 
 const RECEIVE_FLOW_DICE = &'dice'
 
+@export_range(2, 100) var options: int = 3:
+	set(value):
+		value = clampi(value, 3 if avoid_repeat else 2, 100)
+		if options != value:
+			options = value
+			emit_changed()
+	get:
+		return options
 @export var avoid_repeat := false:
 	set(value):
 		if avoid_repeat != value:
@@ -13,16 +21,6 @@ const RECEIVE_FLOW_DICE = &'dice'
 			emit_changed()
 	get:
 		return avoid_repeat
-
-@export_range(2, 100)
-var options: int = 3:
-	set(value):
-		value = clampi(value, 3 if avoid_repeat else 2, 100)
-		if options != value:
-			options = value
-			emit_changed()
-	get:
-		return options
 
 
 func _get_receive_flows() -> Array[StringName]:
@@ -46,8 +44,10 @@ func _get_editor_icon() -> Texture2D:
 	return load(path)
 
 
-func _create_editor_custom_action(parameters: Dictionary) -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_count_action.gd').new(self, &'options')
+func _get_editor_graph_extensions() -> Array[RefCounted]:
+	return [
+		load('res://addons/yasuna/editor/script/graph/extension/ysn_graph_node_extension_steps.gd').new(&'options'),
+	]
 
 
 class State extends YSNCueReactive.State:

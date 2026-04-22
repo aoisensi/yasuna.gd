@@ -1,55 +1,20 @@
 @tool
 extends GraphNode
 
-enum _CustomSlot { BODY, ACTION }
-
 const _YSNGraphEdit = preload('./ysn_graph_edit.gd')
+const _YSNGraphNodeInspector = preload('./ysn_graph_node_inspector.gd')
+const _YSNGraphNodeExtension = preload('./ysn_graph_node_extension.gd')
 
 var _editor: _YSNGraphEdit
 var _cue: YSNCue
+var _inspector: _YSNGraphNodeInspector
 var _id: int
 var _debugger: Object
 var _slots_node: Array[Control] = []
 var _receive_flows: Array[StringName] = []
 var _emit_flows: Array[StringName] = []
 var _icon: TextureButton
-var _custom_body: Control:
-	set(value):
-		if _custom_body == value:
-			return
-		if _custom_body:
-			_custom_body_holder.remove_child(_custom_body)
-			_custom_body.queue_free()
-		_custom_body = value
-		if _custom_body:
-			_custom_body_holder.add_child(_custom_body)
-			add_child(_custom_body_holder)
-			move_child(_custom_body_holder, -1)
-		else:
-			remove_child(_custom_body_holder)
-	get:
-		return _custom_body
-var _custom_body_holder: MarginContainer:
-	get:
-		if not _custom_body_holder:
-			_custom_body_holder = MarginContainer.new()
-			_custom_body_holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
-			_custom_body_holder.add_theme_constant_override(&'margin_bottom', 12)
-		return _custom_body_holder
-var _custom_action: Control:
-	set(value):
-		if _custom_action == value:
-			return
-		var titlebar := get_titlebar_hbox()
-		if _custom_action:
-			titlebar.remove_child(_custom_action)
-			_custom_action.queue_free()
-		_custom_action = value
-		if _custom_action:
-			titlebar.add_child(_custom_action)
-			titlebar.move_child(_custom_action, -1)
-	get:
-		return _custom_action
+var _extensions: Array[_YSNGraphNodeExtension]
 
 
 func _init(editor: _YSNGraphEdit, cue: YSNCue, id: int, debugger: Object = null) -> void:
@@ -75,6 +40,18 @@ func _ready() -> void:
 	_on_cue_script_changed()
 	_on_editor_theme_changed()
 
+	_extensions.clear()
+	for extension in _cue._get_editor_graph_extensions():
+		if extension is not _YSNGraphNodeExtension:
+			push_warning()
+			continue
+		extension.cue = _cue
+		extension.read_only = _debugger != null
+		extension.debugging = _debugger != null
+		extension._graph_edit = _editor
+		extension._apply(self)
+		_extensions.append(extension)
+
 
 func _on_cue_changed() -> void:
 	title = _cue._get_editor_title()
@@ -86,12 +63,17 @@ func _on_cue_changed() -> void:
 
 
 func _on_cue_script_changed() -> void:
-	var parameters: Dictionary = {
-		editable = not _debugger,
-	}
-	_custom_body = _cue._create_editor_custom_body(parameters)
-	_custom_action = _cue._create_editor_custom_action(parameters)
 	_icon.texture_normal = _cue._get_editor_icon()
+	if not _cue._get_editor_graph_properties().is_empty():
+		_inspector = _YSNGraphNodeInspector.new()
+		_inspector.read_only = _debugger != null
+		_inspector.edit(_cue)
+		add_child(_inspector)
+	else:
+		if _inspector:
+			remove_child(_inspector)
+			_inspector.queue_free()
+			_inspector = null
 
 
 func _on_dragged(from: Vector2, to: Vector2) -> void:

@@ -2,11 +2,12 @@
 class_name YSNCueWait
 extends YSNCueAsync
 
-@export var time_sec := 1.0:
+@export_range(0.0, 10.0, 0.01, 'suffix:s', 'or_greater') var time_sec := 1.0:
 	set(value):
-		if time_sec != value:
-			time_sec = value
-			emit_changed()
+		if value < 0.0 or time_sec == value:
+			return
+		time_sec = value
+		emit_changed()
 	get:
 		return time_sec
 @export var process_always := false
@@ -30,8 +31,8 @@ func _get_editor_icon() -> Texture2D:
 	return load('res://addons/yasuna/editor/resource/icon/clock.svg')
 
 
-func _create_editor_custom_body(parameters: Dictionary) -> Control:
-	return load('res://addons/yasuna/editor/script/graph/custom/ysn_graph_node_custom_wait_body.gd').new(self, parameters.editable)
+func _get_editor_graph_properties() -> PackedStringArray:
+	return ['time_sec']
 
 
 class State extends YSNCueAsync.State:
