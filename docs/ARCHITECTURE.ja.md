@@ -3,6 +3,7 @@
 🌐 [English](/docs/ARCHITECTURE.md) | **日本語**
 
 ## 基本の流れ
+
 1. `YSNRunner` が `YSNScenario` を読み込んで実行する
 2. `YSNScenario` に含まれる `YSNCue` が順に実行される
 3. 実行状態は `YSNInstance` と各 `State` に保持される
@@ -15,9 +16,11 @@
 
 シナリオを実行する `Node` クラス。  
 1つの `YSNRunner` から複数のシナリオを同時に実行することもできる。  
+
 - `act()` シナリオを開始する。
 - `capture()` 現在実行中のシナリオの状態を取得できる。
 - `restore()` 状態を復元することができる。
+
 アドオン使用者は、ワールド、キャラクター、ドアなどのインゲームノードに `YSNRunner` をぶら下げ、スクリプトから `YSNScenario` を渡して実行させる。  
 
 ### `YSNScenario`
@@ -34,6 +37,7 @@
 多種多様な継承クラスが用意されている。  
 アドオン使用者は、 `YSNCue` の子クラスを書いて1処理単位の動きを定義していく。  
 しかし `YSNCue` を直接継承する必要はなく(例外はあるかも)、推奨される継承元は以下の3つ。  
+
 - `YSNCueStateless`
 - `YSNCueAsync`
 - `YSNCueReactive`

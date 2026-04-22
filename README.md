@@ -24,7 +24,7 @@ Rather than providing built-in features for specific games, it is intended to le
 
 ## Documentation
 
-- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Architecture Overview](/docs/ARCHITECTURE.md)
 
 ## License
 
