@@ -32,4 +32,5 @@ This addon is released under the MIT License.
 
 ## Third-Party Assets
 
-- **[Editor icons](assets/yasuna/editor/resource/icon/)** by _Paweł Kuna_ (MIT License)
+- **[tabler-icons](https://github.com/tabler/tabler-icons)** by _Paweł Kuna_ (MIT License)
+- **[gdUnit4](https://github.com/godot-gdunit-labs/gdUnit4)** by _Mike Schulze_ (MIT License)
