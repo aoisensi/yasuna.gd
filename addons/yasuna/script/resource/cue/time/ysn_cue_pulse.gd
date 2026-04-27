@@ -60,7 +60,7 @@ class State extends YSNCueReactive.State:
 					return
 				_create_timer(context)
 				_timer.start()
-			RECEIVE_FLOW_RESET:
+			RECEIVE_FLOW_CLOSE:
 				_destroy()
 
 

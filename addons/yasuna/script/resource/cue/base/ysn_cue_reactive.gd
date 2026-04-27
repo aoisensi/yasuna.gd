@@ -3,13 +3,19 @@
 class_name YSNCueReactive
 extends YSNCueStateful
 
-const RECEIVE_FLOW_RESET = &'reset'
+const RECEIVE_FLOW_CLOSE = &'close'
+const EMIT_FLOW_CLOSED = &'closed'
 const EMIT_FLOW_DONE = &'done'
 
 
+func close(context: YSNContext) -> void:
+	context._remove_states()
+	context.emit_flow(EMIT_FLOW_CLOSED)
+
+
 func _received(context: YSNContext) -> void:
-	if context.flow == RECEIVE_FLOW_RESET:
-		context._remove_states()
+	if context.flow == RECEIVE_FLOW_CLOSE:
+		close(context)
 		return
 	var state = context._get_or_create_state()
 	assert(state is YSNCueReactive.State)
@@ -17,7 +23,7 @@ func _received(context: YSNContext) -> void:
 
 
 func _get_receive_flows() -> Array[StringName]:
-	return [RECEIVE_FLOW_RESET]
+	return [RECEIVE_FLOW_CLOSE]
 
 
 func _is_ephemeral() -> bool:
@@ -38,6 +44,10 @@ func _get_number_flows(n: int) -> Array[StringName]:
 
 @abstract
 class State extends YSNCueStateful.State:
+	func close(context: YSNContext) -> void:
+		(cue as YSNCueReactive).close(context)
+
+
 	func _received(context: YSNContext) -> void:
 		_evaluate(context)
 
