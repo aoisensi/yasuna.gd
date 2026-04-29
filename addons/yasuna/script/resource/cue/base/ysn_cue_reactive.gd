@@ -9,8 +9,8 @@ const EMIT_FLOW_DONE = &'done'
 
 
 func close(context: YSNContext) -> void:
-	context._remove_states()
 	context.emit_flow(EMIT_FLOW_CLOSED)
+	context._remove_states()
 
 
 func _received(context: YSNContext) -> void:
