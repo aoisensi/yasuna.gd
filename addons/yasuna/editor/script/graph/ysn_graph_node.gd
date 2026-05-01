@@ -64,16 +64,17 @@ func _on_cue_changed() -> void:
 
 func _on_cue_script_changed() -> void:
 	_icon.texture_normal = _cue._get_editor_icon()
+
+	if _inspector:
+		remove_child(_inspector)
+		_inspector.queue_free()
+		_inspector = null
+
 	if not _cue._get_editor_graph_properties().is_empty():
 		_inspector = _YSNGraphNodeInspector.new()
 		_inspector.read_only = _debugger != null
 		_inspector.edit(_cue)
 		add_child(_inspector)
-	else:
-		if _inspector:
-			remove_child(_inspector)
-			_inspector.queue_free()
-			_inspector = null
 
 
 func _on_dragged(from: Vector2, to: Vector2) -> void:
