@@ -23,6 +23,10 @@ func _get_state_class() -> Script:
 	return State
 
 
+func _is_ephemeral() -> bool:
+	return true
+
+
 func _get_editor_title() -> StringName:
 	return &'Lock'
 

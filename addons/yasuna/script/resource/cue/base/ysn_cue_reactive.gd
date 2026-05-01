@@ -26,10 +26,6 @@ func _get_receive_flows() -> Array[StringName]:
 	return [RECEIVE_FLOW_CLOSE]
 
 
-func _is_ephemeral() -> bool:
-	return true
-
-
 func _get_editor_node_color() -> Color:
 	return Color.YELLOW
 
