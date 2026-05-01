@@ -1,9 +1,10 @@
 @tool
 extends '../ysn_graph_node_extension.gd'
 
+const _BUTTON_SIZE_HALF = 64
+const _BUTTON_FONT_SIZE = 24
+
 var _property: StringName
-var _BUTTON_SIZE_HALF = 64
-var _BUTTON_FONT_SIZE = 24
 
 
 func _apply(node: GraphNode) -> void:
