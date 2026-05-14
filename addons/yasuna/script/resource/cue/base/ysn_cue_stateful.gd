@@ -30,6 +30,10 @@ class State extends RefCounted:
 			return _instance
 
 
+	func emit_flow(flow: StringName) -> void:
+		instance.emit_flow(cue_id, flow)
+
+
 	func destroy() -> void:
 		_destroy()
 		instance._remove_state(self)
