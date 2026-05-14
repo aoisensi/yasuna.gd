@@ -41,7 +41,7 @@ class State extends YSNCueAsync.State:
 		sid = instance.sid
 		if not instance.is_finished: # when immediately scenario
 			await instance.finished
-		complete(context)
+		complete()
 
 
 	func _capture() -> Dictionary:
@@ -53,4 +53,4 @@ class State extends YSNCueAsync.State:
 		var instance := context.runner._instances[sid]
 		if not instance.is_finished:
 			await instance.finished
-		complete(context)
+		complete()

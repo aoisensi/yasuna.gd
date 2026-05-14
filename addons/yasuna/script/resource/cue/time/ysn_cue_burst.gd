@@ -73,7 +73,7 @@ class State extends YSNCueAsync.State:
 			await _timer.timeout
 			_burst(context)
 		_timer.stop()
-		complete(context)
+		complete()
 
 
 	func _capture() -> Dictionary:

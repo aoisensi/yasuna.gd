@@ -32,15 +32,7 @@ func _init(instance: YSNInstance, id: int, flow: StringName) -> void:
 
 
 func emit_flow(flow: StringName) -> void:
-	if instance._canceling:
-		return
-
-	if EngineDebugger.is_active():
-		EngineDebugger.send_message('yasuna:cue_flow_emitted', [instance.get_instance_id(), id, flow])
-
-	for connected in scenario.get_connected_cues(id, flow):
-		instance._queue_emit(connected.cue, connected.flow)
-	instance._run()
+	instance.emit_flow(id, flow)
 
 
 func _create_state() -> YSNCueStateful.State:
@@ -62,14 +54,3 @@ func _get_or_create_state() -> YSNCueStateful.State:
 			push_warning()
 		return states.front()
 	return _create_state()
-
-
-func _remove_states() -> void:
-	for state in instance._get_states(cue):
-		state._destroy()
-	instance._remove_states(cue)
-
-
-func _remove_state(state: YSNCueStateful.State) -> void:
-	state._destroy()
-	instance._remove_state(state)

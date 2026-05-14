@@ -8,14 +8,11 @@ const EMIT_FLOW_CLOSED = &'closed'
 const EMIT_FLOW_DONE = &'done'
 
 
-func close(context: YSNContext) -> void:
-	context.emit_flow(EMIT_FLOW_CLOSED)
-	context._remove_states()
-
-
 func _received(context: YSNContext) -> void:
 	if context.flow == RECEIVE_FLOW_CLOSE:
-		close(context)
+		var state := context._get_state()
+		if state:
+			state.close()
 		return
 	var state = context._get_or_create_state()
 	assert(state is YSNCueReactive.State)
@@ -40,8 +37,9 @@ func _get_number_flows(n: int) -> Array[StringName]:
 
 @abstract
 class State extends YSNCueStateful.State:
-	func close(context: YSNContext) -> void:
-		(cue as YSNCueReactive).close(context)
+	func close() -> void:
+		instance.emit_flow(cue_id, EMIT_FLOW_CLOSED)
+		destroy()
 
 
 	func _received(context: YSNContext) -> void:

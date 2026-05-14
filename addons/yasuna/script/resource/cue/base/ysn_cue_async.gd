@@ -34,9 +34,9 @@ class State extends YSNCueStateful.State:
 		await _perform(context)
 
 
-	func complete(context: YSNContext) -> void:
-		context.emit_flow(EMIT_FLOW_COMPLETED)
-		context._remove_state(self)
+	func complete() -> void:
+		instance.emit_flow(cue_id, EMIT_FLOW_COMPLETED)
+		destroy()
 
 
 	@abstract func _perform(context: YSNContext) -> void

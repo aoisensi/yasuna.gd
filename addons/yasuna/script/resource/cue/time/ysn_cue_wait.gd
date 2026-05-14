@@ -43,8 +43,7 @@ class State extends YSNCueAsync.State:
 		var cue := context.cue as YSNCueWait
 		var time_sec := cue._get_time_sec()
 		_timer = _create_timer(context, time_sec)
-		await _timer.timeout
-		complete(context)
+		_timer.timeout.connect(complete, CONNECT_ONE_SHOT)
 
 
 	func _create_timer(context: YSNContext, time_sec: float) -> SceneTreeTimer:
@@ -59,5 +58,4 @@ class State extends YSNCueAsync.State:
 
 	func _restore(context: YSNContext, data: Dictionary) -> void:
 		_timer = _create_timer(context, data.time_left)
-		await _timer.timeout
-		complete(context)
+		_timer.timeout.connect(complete, CONNECT_ONE_SHOT)

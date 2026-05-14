@@ -30,6 +30,11 @@ class State extends RefCounted:
 			return _instance
 
 
+	func destroy() -> void:
+		_destroy()
+		instance._remove_state(self)
+
+
 	func _setup(context: YSNContext) -> void:
 		pass
 

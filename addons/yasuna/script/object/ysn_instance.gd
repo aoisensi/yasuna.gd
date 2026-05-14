@@ -33,6 +33,18 @@ var _canceling := false
 var _is_closed := false
 
 
+func emit_flow(cue_id: int, flow: StringName) -> void:
+	if _canceling:
+		return
+
+	if EngineDebugger.is_active():
+		EngineDebugger.send_message('yasuna:cue_flow_emitted', [get_instance_id(), cue_id, flow])
+
+	for connected in scenario.get_connected_cues(cue_id, flow):
+		_queue_emit(connected.cue, connected.flow)
+	_run()
+
+
 func abort() -> void:
 	if is_closed:
 		push_warning()
