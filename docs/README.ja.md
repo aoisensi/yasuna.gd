@@ -32,5 +32,5 @@ Godot 4向けのグラフベースのステートフルなシナリオアドオ�
 
 ## サードパーティーアセット
 
-- _Paweł Kuna_ による **[tabler-icons](https://github.com/tabler/tabler-icons)** (MIT License)
+- _Valentin Fossati_ による **[at-icons](https://github.com/Voxybuns/at-icons)** (MIT License)
 - _Mike Schulze_ による **[gdUnit4](https://github.com/godot-gdunit-labs/gdUnit4)** (MIT License)

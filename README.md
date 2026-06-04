@@ -32,5 +32,5 @@ This addon is released under the MIT License.
 
 ## Third-Party Assets
 
-- **[tabler-icons](https://github.com/tabler/tabler-icons)** by _Paweł Kuna_ (MIT License)
+- **[at-icons](https://github.com/Voxybuns/at-icons)** by _Valentin Fossati_ (MIT License)
 - **[gdUnit4](https://github.com/godot-gdunit-labs/gdUnit4)** by _Mike Schulze_ (MIT License)
