@@ -5,13 +5,13 @@ const _GraphNodeCue := preload('./element/graph_node_cue.gd')
 
 var _scenario: YSNScenario
 var _nodes: Dictionary[int, GraphElement]
+var _draggers: Dictionary[int, PackedVector2Array] = { } # [0] = from, [1] = to
 
 
 func _init(scenario: YSNScenario) -> void:
 	assert(scenario)
 	_scenario = scenario
 
-	begin_node_move.connect(_on_begin_node_move)
 	end_node_move.connect(_on_end_node_move)
 	delete_nodes_request.connect(_on_delete_nodes_request)
 
@@ -34,12 +34,15 @@ func _on_scenario_changed() -> void:
 		node.position_offset = _scenario.get_element_position(id)
 
 
-func _on_begin_node_move() -> void:
-	EditorInterface.get_editor_undo_redo().create_action(tr('[YSN] Move Scenario Element(s)'), UndoRedo.MERGE_ALL)
-
-
 func _on_end_node_move() -> void:
-	EditorInterface.get_editor_undo_redo().commit_action()
+	var undo_redo := EditorInterface.get_editor_undo_redo()
+	undo_redo.create_action(tr('[YSN] Move Scenario Element(s)'))
+	for id in _draggers:
+		var p := _draggers[id]
+		undo_redo.add_do_method(_scenario, &'set_element_position', id, p[1])
+		undo_redo.add_undo_method(_scenario, &'set_element_position', id, p[0])
+	undo_redo.commit_action()
+	_draggers.clear()
 
 
 func _on_delete_nodes_request(nodes: Array[StringName]) -> void:
@@ -69,7 +72,7 @@ func _add_element(element: YSNElement) -> GraphElement:
 	assert(element.id)
 	var node: GraphElement
 	if element is YSNCue:
-		node = _GraphNodeCue.new(element)
+		node = _GraphNodeCue.new(element, self)
 	if not node:
 		push_error()
 		return null

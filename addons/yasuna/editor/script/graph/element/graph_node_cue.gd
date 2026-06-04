@@ -1,12 +1,17 @@
 @tool
 extends GraphNode
 
+const _GraphEdit := preload('../graph_edit.gd')
+
+var _edit: _GraphEdit
 var _cue: YSNCue
 
 
-func _init(cue: YSNCue) -> void:
+func _init(cue: YSNCue, edit: _GraphEdit) -> void:
 	assert(cue)
+	assert(edit)
 	_cue = cue
+	_edit = edit
 
 	dragged.connect(_on_dragged)
 	node_selected.connect(_on_node_selected)
@@ -22,9 +27,7 @@ func _on_node_selected() -> void:
 
 
 func _on_dragged(from: Vector2, to: Vector2) -> void:
-	var undo_redo := EditorInterface.get_editor_undo_redo()
-	undo_redo.add_do_method(_cue.scenario, &'set_element_position', _cue.id, to)
-	undo_redo.add_undo_method(_cue.scenario, &'set_element_position', _cue.id, from)
+	_edit._draggers[_cue.id] = PackedVector2Array([from, to])
 #endregion
 
 
