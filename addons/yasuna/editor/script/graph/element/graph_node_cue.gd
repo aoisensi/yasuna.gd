@@ -1,10 +1,13 @@
 @tool
 extends GraphNode
 
+const SLOT_TYPE_DEFAULT := 0
+const SLOT_COLOR := Color.WHITE
 const _GraphEdit := preload('../graph_edit.gd')
 
 var _edit: _GraphEdit
 var _cue: YSNCue
+var _flow_nodes: Array[Control]
 
 
 func _init(cue: YSNCue, edit: _GraphEdit) -> void:
@@ -17,8 +20,10 @@ func _init(cue: YSNCue, edit: _GraphEdit) -> void:
 	node_selected.connect(_on_node_selected)
 
 	_cue.script_changed.connect(_on_cue_script_changed)
+	_cue.flows_changed.connect(_on_cue_flows_changed)
 
 	_on_cue_script_changed()
+	_on_cue_flows_changed()
 
 
 #region Signal
@@ -34,4 +39,42 @@ func _on_dragged(from: Vector2, to: Vector2) -> void:
 #region Cue Signal
 func _on_cue_script_changed() -> void:
 	title = _cue._editor_get_title()
+
+
+func _on_cue_flows_changed() -> void:
+	_rebuild_flows()
+#endregion
+
+
+#region Node
+func _rebuild_flows() -> void:
+	clear_all_slots()
+	for child in _flow_nodes:
+		remove_child(child)
+		child.queue_free()
+	_flow_nodes.clear()
+	for i in range(max(_cue._inputs.size(), _cue._outputs.size())):
+		var hbox := HBoxContainer.new()
+		if i < _cue._inputs.size():
+			var label := _create_flow_label(_cue._inputs[i])
+			hbox.add_child(label)
+			set_slot_enabled_left(i, true)
+			set_slot_color_left(i, SLOT_COLOR)
+			set_slot_type_left(i, SLOT_TYPE_DEFAULT)
+		hbox.add_spacer(false)
+		if i < _cue._outputs.size():
+			var label := _create_flow_label(_cue._outputs[i])
+			hbox.add_child(label)
+			set_slot_enabled_right(i, true)
+			set_slot_color_right(i, SLOT_COLOR)
+			set_slot_type_right(i, SLOT_TYPE_DEFAULT)
+		_flow_nodes.append(hbox)
+		add_child(hbox)
+
+
+func _create_flow_label(item: Dictionary) -> Label:
+	var name := item.name as String
+	var label := Label.new()
+	label.text = name.capitalize()
+	return label
 #endregion

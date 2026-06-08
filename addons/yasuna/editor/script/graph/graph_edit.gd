@@ -12,6 +12,10 @@ func _init(scenario: YSNScenario) -> void:
 	assert(scenario)
 	_scenario = scenario
 
+	right_disconnects = true
+
+	connection_request.connect(_on_connection_request.bind(true))
+	disconnection_request.connect(_on_connection_request.bind(false))
 	end_node_move.connect(_on_end_node_move)
 	delete_nodes_request.connect(_on_delete_nodes_request)
 
@@ -32,6 +36,23 @@ func _on_scenario_changed() -> void:
 			_add_element(element)
 		var node := _nodes[id]
 		node.position_offset = _scenario.get_element_position(id)
+	connections = _scenario._get_connections()
+
+
+func _on_connection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int, connecting: bool) -> void:
+	var from_cue := get_node(String(from_node)) as _GraphNodeCue
+	var to_cue := get_node(String(to_node)) as _GraphNodeCue
+	if not (from_cue and to_cue):
+		push_error()
+		return
+	var from_flow := from_cue._cue._outputs[from_port].name as String
+	var to_flow := to_cue._cue._inputs[to_port].name as String
+	if connecting:
+		var err := _scenario.connect_cue(from_cue._cue.id, from_flow, to_cue._cue.id, to_flow)
+		if err != OK:
+			push_error(error_string(err))
+	else:
+		_scenario.disconnect_cue(from_cue._cue.id, from_flow, to_cue._cue.id, to_flow)
 
 
 func _on_end_node_move() -> void:

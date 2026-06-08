@@ -2,8 +2,7 @@
 class_name YSNScenario
 extends Resource
 
-const _P_NEXT_ELEMENT_ID = &'next_element_id'
-
+var _connections: Dictionary[int, Dictionary]
 var _elements: Dictionary[int, YSNElement]
 var _positions: Dictionary[int, Vector2]
 var _next_element_id: int = 1
@@ -13,69 +12,94 @@ var _next_element_id: int = 1
 func _get_property_list() -> Array[Dictionary]:
 	var list: Array[Dictionary] = [
 		{
-			name = _P_NEXT_ELEMENT_ID,
+			name = 'next_element_id',
 			type = TYPE_INT,
 			usage = PROPERTY_USAGE_STORAGE,
 		},
 	]
 	for id in _elements:
-		list.append(
-			{
-				name = 'elements/%d/element' % id,
-				type = TYPE_OBJECT,
-				usage = PROPERTY_USAGE_STORAGE,
-			},
-		)
-		if _positions.has(id):
-			list.append(
+		list.append_array(
+			[
+				{
+					name = 'elements/%d/element' % id,
+					type = TYPE_OBJECT,
+					usage = PROPERTY_USAGE_STORAGE,
+				},
 				{
 					name = 'elements/%d/position' % id,
 					type = TYPE_VECTOR2,
 					usage = PROPERTY_USAGE_STORAGE,
 				},
-			)
+			],
+		)
+	list.append(
+		{
+			name = 'connections',
+			type = TYPE_PACKED_STRING_ARRAY,
+			usage = PROPERTY_USAGE_STORAGE,
+		},
+	)
 	return list
 
 
 func _get(property: StringName) -> Variant:
-	if property == _P_NEXT_ELEMENT_ID:
-		return max(_next_element_id, 1)
+	match property:
+		&'next_element_id':
+			return max(_next_element_id, 1)
+		&'connections':
+			var connections := PackedStringArray()
+			_iter_connections(
+				func(from_id: int, from_flow: StringName, to_id: int, to_flow: StringName) -> void:
+					connections.append('%d/%s/%d/%s' % [from_id, from_flow, to_id, to_flow])
+			)
+			return connections
+
 	var path := String(property).split('/')
-	if 'elements' != path.get(0):
-		return null
-	var id := int(path.get(1))
-	if id <= 0:
-		return null
-	match path.get(2):
-		'element':
-			return _elements.get(id)
-		'position':
-			return _positions.get(id, Vector2.ZERO)
+	match path.get(0):
+		'elements':
+			var id := int(path.get(1))
+			if id <= 0:
+				return null
+			match path.get(2):
+				'element':
+					return _elements.get(id)
+				'position':
+					return _positions.get(id, Vector2.ZERO)
 	return null
 
 
 func _set(property: StringName, value: Variant) -> bool:
-	if property == _P_NEXT_ELEMENT_ID:
-		_next_element_id = value
-		return true
+	match property:
+		&'next_element_id':
+			_next_element_id = value
+			return true
+		&'connections':
+			for cs in value as PackedStringArray:
+				var c := cs.split('/')
+				assert(c.size() == 4)
+				_connect(int(c[0]), c[1], int(c[2]), c[3])
+			return true
+
 	var path := String(property).split('/')
-	if 'elements' != path.get(0):
-		return false
-	var id := int(path.get(1))
-	if id <= 0:
-		return false
-	match path.get(2):
-		'element':
-			assert(value is YSNElement)
-			value._id = id
-			value._scenario = self
-			_elements[id] = value
-		'position':
-			assert(value is Vector2)
-			_positions[id] = value
-		_:
-			return false
-	return true
+	match path.get(0):
+		'elements':
+			var id := int(path.get(1))
+			if id <= 0:
+				return false
+			match path.get(2):
+				'element':
+					if value is not YSNElement:
+						return false
+					value._id = id
+					value._scenario = self
+					_elements[id] = value
+					return true
+				'position':
+					if value is not Vector2:
+						return false
+					_positions[id] = value
+					return true
+	return false
 #endregion
 
 
@@ -97,8 +121,8 @@ func add_element(element: YSNElement, position := Vector2.ZERO, id := -1) -> int
 		_next_element_id += 1
 	element._scenario = self
 	element._id = id
+	element._position = position
 	_elements[id] = element
-	_positions[id] = position
 	notify_property_list_changed()
 	emit_changed()
 	return id
@@ -106,8 +130,18 @@ func add_element(element: YSNElement, position := Vector2.ZERO, id := -1) -> int
 
 func remove_element(id: int) -> void:
 	_elements.erase(id)
-	_positions.erase(id)
 	notify_property_list_changed()
+	emit_changed()
+
+
+func connect_cue(from_cue: int, from_flow: StringName, to_cue: int, to_flow: StringName) -> Error:
+	_connect(from_cue, from_flow, to_cue, to_flow)
+	emit_changed()
+	return OK
+
+
+func disconnect_cue(from_cue: int, from_flow: StringName, to_cue: int, to_flow: StringName) -> void:
+	_disconnect(from_cue, from_flow, to_cue, to_flow)
 	emit_changed()
 
 
@@ -116,7 +150,11 @@ func get_cue(id: int) -> YSNCue:
 
 
 func get_element(id: int) -> YSNElement:
-	return _elements.get(id)
+	var element := _elements.get(id)
+	if element:
+		return element
+	push_error()
+	return null
 
 
 func get_element_id(element: YSNElement) -> int:
@@ -139,15 +177,64 @@ func get_valid_element_id() -> int:
 
 
 func get_element_position(id: int) -> Vector2:
-	return _positions.get(id, Vector2.ZERO)
+	var element: YSNElement = _elements.get(id)
+	if not element:
+		push_error()
+		return Vector2.ZERO
+	return element._position
 
 
 func set_element_position(id: int, position: Vector2) -> void:
-	if not _elements.has(id):
-		return
-	var added := not _positions.has(id)
 	_positions[id] = position
-	if added:
-		notify_property_list_changed()
 	emit_changed()
 #endregion
+
+
+func _get_connections() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	_iter_connections(
+		func(from_id: int, from_flow: StringName, to_id: int, to_flow: StringName) -> void:
+			result.append(
+				{
+					from_node = StringName(str(from_id)),
+					from_port = (get_cue(from_id) as YSNCue).get_output_index(from_flow),
+					to_node = StringName(str(to_id)),
+					to_port = (get_cue(to_id) as YSNCue).get_input_index(to_flow),
+					keep_alive = true,
+				},
+			)
+	)
+	return result
+
+
+func _iter_connections(f: Callable) -> void:
+	for from_id in _connections:
+		var ccc: Dictionary = _connections[from_id]
+		for from_flow in ccc:
+			var cc: Dictionary = ccc[from_flow]
+			for to_id in cc:
+				var c: Dictionary = cc[to_id]
+				for to_flow in c:
+					if c[to_flow]:
+						f.call(from_id, from_flow, to_id, to_flow)
+
+
+func _connect(from_cue: int, from_flow: StringName, to_cue: int, to_flow: StringName) -> bool:
+	var c: Dictionary = _connections.get_or_add(from_cue, { }).get_or_add(from_flow, { }).get_or_add(to_cue, { })
+	if c.has(to_flow):
+		return false
+	c[to_flow] = true
+	return true
+
+
+func _disconnect(from_cue: int, from_flow: StringName, to_cue: int, to_flow: StringName) -> bool:
+	var ccc: Dictionary = _connections.get(from_cue)
+	if not ccc:
+		return false
+	var cc: Dictionary = ccc.get(from_flow)
+	if not cc:
+		return false
+	var c: Dictionary = cc.get(to_cue)
+	if not c:
+		return false
+	return c.erase(to_flow)
