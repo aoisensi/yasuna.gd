@@ -14,6 +14,7 @@ func _init(scenario: YSNScenario) -> void:
 
 	right_disconnects = true
 
+	connection_drag_started.connect(_on_connection_drag_started)
 	connection_request.connect(_on_connection_request.bind(true))
 	disconnection_request.connect(_on_connection_request.bind(false))
 	end_node_move.connect(_on_end_node_move)
@@ -39,14 +40,28 @@ func _on_scenario_changed() -> void:
 	connections = _scenario._get_connections()
 
 
+func _on_connection_drag_started(from_node: StringName, from_port: int, is_output: bool) -> void:
+	if not is_output:
+		return
+	var cue := _scenario.get_cue(int(str(from_node)))
+	var outputs := cue._get_outputs()
+	var key := '%s/%s' % [from_node, outputs[from_port].name]
+	if _scenario._connections.has(key):
+		force_connection_drag_end()
+	# give me
+	# left_disconnects = true
+
+
 func _on_connection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int, connecting: bool) -> void:
 	var from_cue := get_node(String(from_node)) as _GraphNodeCue
 	var to_cue := get_node(String(to_node)) as _GraphNodeCue
 	if not (from_cue and to_cue):
 		push_error()
 		return
-	var from_flow := from_cue._cue._outputs[from_port].name as String
-	var to_flow := to_cue._cue._inputs[to_port].name as String
+	var outputs := from_cue._cue._get_outputs()
+	var inputs := to_cue._cue._get_inputs()
+	var from_flow := outputs[from_port].name as String
+	var to_flow := inputs[to_port].name as String
 	if connecting:
 		var err := _scenario.connect_cue(from_cue._cue.id, from_flow, to_cue._cue.id, to_flow)
 		if err != OK:

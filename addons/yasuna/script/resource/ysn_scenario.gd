@@ -2,7 +2,7 @@
 class_name YSNScenario
 extends Resource
 
-var _connections: Dictionary[int, Dictionary]
+var _connections: Dictionary[String, String]
 var _elements: Dictionary[int, YSNElement]
 var _positions: Dictionary[int, Vector2]
 var _next_element_id: int = 1
@@ -48,10 +48,9 @@ func _get(property: StringName) -> Variant:
 			return max(_next_element_id, 1)
 		&'connections':
 			var connections := PackedStringArray()
-			_iter_connections(
-				func(from_id: int, from_flow: StringName, to_id: int, to_flow: StringName) -> void:
-					connections.append('%d/%s/%d/%s' % [from_id, from_flow, to_id, to_flow])
-			)
+			for from in _connections:
+				var to := _connections[from]
+				connections.append('%s/%s' % [from, to])
 			return connections
 
 	var path := String(property).split('/')
@@ -121,7 +120,7 @@ func add_element(element: YSNElement, position := Vector2.ZERO, id := -1) -> int
 		_next_element_id += 1
 	element._scenario = self
 	element._id = id
-	element._position = position
+	_positions[id] = position
 	_elements[id] = element
 	notify_property_list_changed()
 	emit_changed()
@@ -177,11 +176,7 @@ func get_valid_element_id() -> int:
 
 
 func get_element_position(id: int) -> Vector2:
-	var element: YSNElement = _elements.get(id)
-	if not element:
-		push_error()
-		return Vector2.ZERO
-	return element._position
+	return _positions.get(id, Vector2.ZERO)
 
 
 func set_element_position(id: int, position: Vector2) -> void:
@@ -208,33 +203,25 @@ func _get_connections() -> Array[Dictionary]:
 
 
 func _iter_connections(f: Callable) -> void:
-	for from_id in _connections:
-		var ccc: Dictionary = _connections[from_id]
-		for from_flow in ccc:
-			var cc: Dictionary = ccc[from_flow]
-			for to_id in cc:
-				var c: Dictionary = cc[to_id]
-				for to_flow in c:
-					if c[to_flow]:
-						f.call(from_id, from_flow, to_id, to_flow)
+	for from in _connections:
+		var to := _connections[from]
+		var froms := from.split('/')
+		var tos := to.split('/')
+		f.call(int(froms[0]), froms[1], int(tos[0]), tos[1])
 
 
 func _connect(from_cue: int, from_flow: StringName, to_cue: int, to_flow: StringName) -> bool:
-	var c: Dictionary = _connections.get_or_add(from_cue, { }).get_or_add(from_flow, { }).get_or_add(to_cue, { })
-	if c.has(to_flow):
+	var key := '%d/%s' % [from_cue, from_flow]
+	if _connections.has(key):
 		return false
-	c[to_flow] = true
+	var value := '%d/%s' % [to_cue, to_flow]
+	_connections[key] = value
 	return true
 
 
 func _disconnect(from_cue: int, from_flow: StringName, to_cue: int, to_flow: StringName) -> bool:
-	var ccc: Dictionary = _connections.get(from_cue)
-	if not ccc:
+	var key := '%d/%s' % [from_cue, from_flow]
+	var value := '%d/%s' % [to_cue, to_flow]
+	if _connections.get(key) != value:
 		return false
-	var cc: Dictionary = ccc.get(from_flow)
-	if not cc:
-		return false
-	var c: Dictionary = cc.get(to_cue)
-	if not c:
-		return false
-	return c.erase(to_flow)
+	return _connections.erase(key)

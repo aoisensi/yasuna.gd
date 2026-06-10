@@ -17,6 +17,7 @@ func _init() -> void:
 	index_pressed.connect(_on_index_pressed)
 
 	ProjectSettings.settings_changed.connect(_on_settings_changed)
+	EditorInterface.get_resource_filesystem().script_classes_updated.connect(_on_script_classes_updated)
 
 	_on_settings_changed()
 
@@ -27,6 +28,10 @@ func _on_index_pressed(index: int) -> void:
 		push_error()
 		return
 	meta.call()
+
+
+func _on_script_classes_updated() -> void:
+	_on_settings_changed()
 
 
 func _on_settings_changed() -> void:

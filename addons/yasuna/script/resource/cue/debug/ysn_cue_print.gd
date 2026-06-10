@@ -2,20 +2,19 @@
 class_name YSNCuePrint
 extends YSNCue
 
-signal print(context: YSNContext)
-signal on_printed
-
-@export var message: String = 'hi'
+@export_multiline() var message: String = 'hi'
 
 
-func _setup() -> void:
-	print.connect(_on_print)
-
-
-func _on_print(context: YSNContext) -> void:
-	print(message)
-	on_printed.emit()
+func _perform(context: YSNContext) -> void:
+	match context.input:
+		'do':
+			print(message)
+			context.emit_flow('then')
 
 
 func _editor_get_title() -> String:
 	return &'Print'
+
+
+func _editor_get_icon() -> Texture2D:
+	return load('res://addons/at-icons/node/pencil.svg')
