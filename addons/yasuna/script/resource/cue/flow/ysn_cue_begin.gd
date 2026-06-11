@@ -2,13 +2,15 @@
 class_name YSNCueBegin
 extends YSNCue
 
+@export var begin_name := &'main'
+
 
 func _get_inputs() -> Array[Dictionary]:
 	return []
 
 
 func _perform(context: YSNContext) -> void:
-	context.emit_flow(&'then')
+	pass
 
 
 func _editor_get_title() -> String:

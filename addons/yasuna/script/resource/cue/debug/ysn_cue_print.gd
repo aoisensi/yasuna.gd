@@ -7,9 +7,9 @@ extends YSNCue
 
 func _perform(context: YSNContext) -> void:
 	match context.input:
-		'do':
+		INPUT_DO:
 			print(message)
-			context.emit_flow('then')
+			context.emit_flow(OUTPUT_THEN)
 
 
 func _editor_get_title() -> String:

@@ -129,6 +129,7 @@ func add_element(element: YSNElement, position := Vector2.ZERO, id := -1) -> int
 
 func remove_element(id: int) -> void:
 	_elements.erase(id)
+	_validate_connections()
 	notify_property_list_changed()
 	emit_changed()
 
@@ -141,6 +142,7 @@ func connect_cue(from_cue: int, from_flow: StringName, to_cue: int, to_flow: Str
 
 func disconnect_cue(from_cue: int, from_flow: StringName, to_cue: int, to_flow: StringName) -> void:
 	_disconnect(from_cue, from_flow, to_cue, to_flow)
+	_validate_connections()
 	emit_changed()
 
 
@@ -167,7 +169,7 @@ func get_element_list() -> PackedInt32Array:
 
 func get_cue_list() -> PackedInt32Array:
 	var list := _elements.keys()
-	list = list.filter(func(id: int): _elements[id] is YSNCue)
+	list = list.filter(func(id: int): return _elements[id] is YSNCue)
 	return PackedInt32Array(list)
 
 
@@ -225,3 +227,15 @@ func _disconnect(from_cue: int, from_flow: StringName, to_cue: int, to_flow: Str
 	if _connections.get(key) != value:
 		return false
 	return _connections.erase(key)
+
+
+func _validate_connections() -> void:
+	var froms: Array[String] = _connections.keys()
+	for from in froms:
+		var to := _connections[from]
+		var from_s := from.split('/')
+		var to_s := to.split('/')
+		var from_id := int(from_s[0])
+		var to_id := int(to_s[1])
+		if _elements.get(from_id) is not YSNCue or _elements.get(to_id) is not YSNCue:
+			_connections.erase(from)

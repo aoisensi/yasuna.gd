@@ -5,6 +5,16 @@ extends YSNElement
 
 signal flows_changed
 
+const INPUT_DO = &'do'
+const OUTPUT_THEN = &'then'
+
+var instance: YSNInstance:
+	get:
+		if not _instance:
+			push_error('yasuna: stateless cue cannot access instance.')
+		return _instance
+var _instance: YSNInstance
+
 
 #region Public Method
 func get_output_index(name: StringName) -> int:
@@ -18,11 +28,11 @@ func get_input_index(name: StringName) -> int:
 
 #region Virtual Method
 func _get_inputs() -> Array[Dictionary]:
-	return [{ name = 'do' }]
+	return [{ name = INPUT_DO }]
 
 
 func _get_outputs() -> Array[Dictionary]:
-	return [{ name = 'then' }]
+	return [{ name = OUTPUT_THEN }]
 
 
 @abstract

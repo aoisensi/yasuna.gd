@@ -23,12 +23,25 @@ func _init(runner: YSNRunner, scenario: YSNScenario) -> void:
 		var cue := _scenario.get_cue(id)
 		if not cue._is_stateless():
 			cue = cue.duplicate()
-		if cue is YSNCueBegin:
-			_begins[&'main'] = id # TODO: begin name
+			cue._instance = self
+		_cues[id] = cue
+
+
+func _emit_flow(id: int, output: StringName) -> void:
+	var c: String = _scenario._connections.get('%d/%s' % [id, output], '')
+	if not c:
+		return
+	var cs := c.split('/')
+	var next_id := int(cs[0])
+	var cue := _cues[next_id]
+	var context := YSNContext.new(self, next_id, StringName(cs[1]))
+	cue._perform(context)
 
 
 func _begin(name := &'main') -> void:
-	var cue: YSNCueBegin = _cues.get(_begins.get(name, 0))
-	if not cue:
-		return
-	# TODO
+	for id in _cues:
+		var cue := _cues[id] as YSNCueBegin
+		if not cue:
+			continue
+		if cue.begin_name == name:
+			_emit_flow(id, YSNCue.OUTPUT_THEN)

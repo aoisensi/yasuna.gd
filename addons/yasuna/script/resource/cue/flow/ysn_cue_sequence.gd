@@ -22,7 +22,10 @@ func _get_outputs() -> Array[Dictionary]:
 
 
 func _perform(context: YSNContext) -> void:
-	pass # TODO
+	match context.input:
+		INPUT_DO:
+			for i in range(1, count + 1):
+				context.emit_flow(StringName(str(i)))
 
 
 func _editor_get_title() -> String:

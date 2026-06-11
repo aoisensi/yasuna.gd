@@ -68,13 +68,13 @@ func _rebuild_flows() -> void:
 		var hbox := HBoxContainer.new()
 		hbox.custom_minimum_size.y = 32.0
 		if i < inputs.size():
-			_add_flow_label(hbox, inputs[i], 'do')
+			_add_flow_label(hbox, inputs[i], YSNCue.INPUT_DO)
 			set_slot_enabled_left(i, true)
 			set_slot_color_left(i, SLOT_COLOR)
 			set_slot_type_left(i, SLOT_TYPE_DEFAULT)
 		hbox.add_spacer(false)
 		if i < outputs.size():
-			_add_flow_label(hbox, outputs[i], 'then')
+			_add_flow_label(hbox, outputs[i], YSNCue.OUTPUT_THEN)
 			set_slot_enabled_right(i, true)
 			set_slot_color_right(i, SLOT_COLOR)
 			set_slot_type_right(i, SLOT_TYPE_DEFAULT)
