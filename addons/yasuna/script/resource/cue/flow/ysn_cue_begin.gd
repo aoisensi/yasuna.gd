@@ -13,7 +13,7 @@ func _perform(context: YSNContext) -> void:
 	pass
 
 
-func _editor_get_title() -> String:
+func _editor_get_name() -> String:
 	return &'Begin'
 
 

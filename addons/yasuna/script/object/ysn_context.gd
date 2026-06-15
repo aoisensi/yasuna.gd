@@ -16,6 +16,9 @@ var args: Array:
 var scenario: YSNScenario:
 	get:
 		return instance.scenario
+var runner: YSNRunner:
+	get:
+		return instance.runner
 var _id: int
 var _instance: YSNInstance
 var _input: StringName

@@ -12,7 +12,7 @@ func _perform(context: YSNContext) -> void:
 			context.emit_flow(OUTPUT_THEN)
 
 
-func _editor_get_title() -> String:
+func _editor_get_name() -> String:
 	return &'Print'
 
 

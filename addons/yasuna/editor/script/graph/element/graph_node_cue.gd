@@ -43,7 +43,7 @@ func _on_dragged(from: Vector2, to: Vector2) -> void:
 
 #region Cue Signal
 func _on_cue_script_changed() -> void:
-	title = _cue._editor_get_title()
+	title = _cue._editor_get_name()
 	var icon := _cue._editor_get_icon()
 	_icon.visible = icon != null
 	if icon:

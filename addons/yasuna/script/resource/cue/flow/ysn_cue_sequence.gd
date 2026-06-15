@@ -28,7 +28,7 @@ func _perform(context: YSNContext) -> void:
 				context.emit_flow(StringName(str(i)))
 
 
-func _editor_get_title() -> String:
+func _editor_get_name() -> String:
 	return &'Sequence'
 
 
