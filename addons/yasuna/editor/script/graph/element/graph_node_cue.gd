@@ -17,6 +17,9 @@ func _init(cue: YSNCue, edit: _GraphEdit) -> void:
 	_cue = cue
 	_edit = edit
 
+	_icon.custom_maximum_size = Vector2(16.0, 16.0)
+	_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
 	var titlebar := get_titlebar_hbox()
 	titlebar.add_child(_icon)
 	titlebar.move_child(_icon, 0)
