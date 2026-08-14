@@ -7,8 +7,9 @@ const _GraphEdit := preload('../graph_edit.gd')
 
 var _edit: _GraphEdit
 var _cue: YSNCue
-var _flow_nodes: Array[Control]
+var _flow_nodes: Array[Control] = []
 var _icon := TextureRect.new()
+var _properties: Dictionary[StringName, EditorProperty] = { }
 
 
 func _init(cue: YSNCue, edit: _GraphEdit) -> void:
@@ -27,6 +28,7 @@ func _init(cue: YSNCue, edit: _GraphEdit) -> void:
 	dragged.connect(_on_dragged)
 	node_selected.connect(_on_node_selected)
 
+	_cue.changed.connect(_on_cue_changed)
 	_cue.script_changed.connect(_on_cue_script_changed)
 	_cue.flows_changed.connect(_on_cue_flows_changed)
 
@@ -54,13 +56,36 @@ func _on_cue_script_changed() -> void:
 
 
 func _on_cue_flows_changed() -> void:
-	_rebuild_flows()
+	_rebuild_controls()
+
+
+func _on_cue_changed() -> void:
+	for path in _properties:
+		var property := _properties[path]
+		property.update_property()
+
+
+func _on_property_property_changed(
+	property: StringName,
+	value: Variant,
+	field: StringName,
+	changing: bool,
+) -> void:
+	var old := _cue.get(property)
+	if old == value:
+		return
+	_cue.set(property, value)
 #endregion
 
 
 #region Node
-func _rebuild_flows() -> void:
+func _rebuild_controls() -> void:
 	clear_all_slots()
+	_rebuild_flows()
+	_rebuild_properties()
+
+
+func _rebuild_flows() -> void:
 	for child in _flow_nodes:
 		remove_child(child)
 		child.queue_free()
@@ -92,4 +117,32 @@ func _add_flow_label(hbox: HBoxContainer, item: Dictionary, skip: String) -> voi
 	var label := Label.new()
 	label.text = name.capitalize()
 	hbox.add_child(label)
+
+
+func _rebuild_properties() -> void:
+	_properties.clear()
+	for path in _cue._editor_get_properties():
+		var info := _get_property_info(_cue, path)
+		var property := EditorInspector.instantiate_property_editor(
+			_cue,
+			info.get(&'type', 0),
+			path,
+			info.get(&'hint', 0),
+			info.get(&'hint_string', ''),
+			info.get(&'usage', 0),
+		)
+		property.set_object_and_property(_cue, path)
+		property.custom_minimum_size.x = 240.0
+		property.draw_label = false
+		property.property_changed.connect(_on_property_property_changed)
+		add_child(property)
+		property.update_property()
+		_properties[path] = property
 #endregion
+
+
+func _get_property_info(object: Object, name: StringName) -> Dictionary:
+	for property in object.get_property_list():
+		if property.name == name:
+			return property
+	return { }

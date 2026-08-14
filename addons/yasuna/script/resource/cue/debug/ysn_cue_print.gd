@@ -2,7 +2,12 @@
 class_name YSNCuePrint
 extends YSNCue
 
-@export_multiline() var message: String = 'hi'
+@export() var message: String = 'hi':
+	set(value):
+		message = value
+		emit_changed()
+	get:
+		return message
 
 
 func _perform(context: YSNContext) -> void:
@@ -18,3 +23,7 @@ func _editor_get_name() -> String:
 
 func _editor_get_icon() -> Texture2D:
 	return load('res://addons/at-icons/node/pencil.svg')
+
+
+func _editor_get_properties() -> Array[StringName]:
+	return [&'message']

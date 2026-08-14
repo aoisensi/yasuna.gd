@@ -18,11 +18,17 @@ var _instance: YSNInstance
 
 #region Public Method
 func get_output_index(name: StringName) -> int:
-	return _get_outputs().find_custom(func(item): return item.name == name)
+	return _get_outputs().find_custom(
+		func(item):
+			return item.name == name,
+	)
 
 
 func get_input_index(name: StringName) -> int:
-	return _get_inputs().find_custom(func(item): return item.name == name)
+	return _get_inputs().find_custom(
+		func(item):
+			return item.name == name,
+	)
 #endregion
 
 
@@ -59,4 +65,12 @@ func _editor_get_icon() -> Texture2D:
 
 func _editor_get_domain() -> StringName:
 	return &'info.aoisensi.yasuna'
+
+
+func _editor_get_properties() -> Array[StringName]:
+	return []
+
+
+func _editor_create_custom_control() -> Control:
+	return null
 #endregion
