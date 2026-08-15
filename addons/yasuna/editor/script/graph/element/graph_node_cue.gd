@@ -35,7 +35,6 @@ func _init(cue: YSNCue, edit: _GraphEdit) -> void:
 	_on_cue_script_changed()
 	_on_cue_flows_changed()
 
-
 #region Signal
 func _on_node_selected() -> void:
 	EditorInterface.inspect_object(_cue)
@@ -44,7 +43,6 @@ func _on_node_selected() -> void:
 func _on_dragged(from: Vector2, to: Vector2) -> void:
 	_edit._draggers[_cue.id] = PackedVector2Array([from, to])
 #endregion
-
 
 #region Cue Signal
 func _on_cue_script_changed() -> void:
@@ -76,7 +74,6 @@ func _on_property_property_changed(
 		return
 	_cue.set(property, value)
 #endregion
-
 
 #region Node
 func _rebuild_controls() -> void:
@@ -139,7 +136,6 @@ func _rebuild_properties() -> void:
 		property.update_property()
 		_properties[path] = property
 #endregion
-
 
 func _get_property_info(object: Object, name: StringName) -> Dictionary:
 	for property in object.get_property_list():

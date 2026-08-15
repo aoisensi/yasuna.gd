@@ -7,15 +7,10 @@ var _elements: Dictionary[int, YSNElement]
 var _positions: Dictionary[int, Vector2]
 var _next_element_id: int = 1
 
-
 #region Property Access
 func _get_property_list() -> Array[Dictionary]:
 	var list: Array[Dictionary] = [
-		{
-			name = 'next_element_id',
-			type = TYPE_INT,
-			usage = PROPERTY_USAGE_STORAGE,
-		},
+		{ name = 'next_element_id', type = TYPE_INT, usage = PROPERTY_USAGE_STORAGE },
 	]
 	for id in _elements:
 		list.append_array(
@@ -33,11 +28,7 @@ func _get_property_list() -> Array[Dictionary]:
 			],
 		)
 	list.append(
-		{
-			name = 'connections',
-			type = TYPE_PACKED_STRING_ARRAY,
-			usage = PROPERTY_USAGE_STORAGE,
-		},
+		{ name = 'connections', type = TYPE_PACKED_STRING_ARRAY, usage = PROPERTY_USAGE_STORAGE },
 	)
 	return list
 
@@ -100,7 +91,6 @@ func _set(property: StringName, value: Variant) -> bool:
 					return true
 	return false
 #endregion
-
 
 #region Public Methods
 func add_element(element: YSNElement, position := Vector2.ZERO, id := -1) -> int:
@@ -169,7 +159,10 @@ func get_element_list() -> PackedInt32Array:
 
 func get_cue_list() -> PackedInt32Array:
 	var list := _elements.keys()
-	list = list.filter(func(id: int): return _elements[id] is YSNCue)
+	list = list.filter(
+		func(id: int):
+			return _elements[id] is YSNCue,
+	)
 	return PackedInt32Array(list)
 
 
@@ -186,7 +179,6 @@ func set_element_position(id: int, position: Vector2) -> void:
 	emit_changed()
 #endregion
 
-
 func _get_connections() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	_iter_connections(
@@ -199,7 +191,7 @@ func _get_connections() -> Array[Dictionary]:
 					to_port = (get_cue(to_id) as YSNCue).get_input_index(to_flow),
 					keep_alive = true,
 				},
-			)
+			),
 	)
 	return result
 

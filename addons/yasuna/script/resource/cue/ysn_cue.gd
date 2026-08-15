@@ -15,7 +15,6 @@ var instance: YSNInstance:
 		return _instance
 var _instance: YSNInstance
 
-
 #region Public Method
 func get_output_index(name: StringName) -> int:
 	return _get_outputs().find_custom(
@@ -30,7 +29,6 @@ func get_input_index(name: StringName) -> int:
 			return item.name == name,
 	)
 #endregion
-
 
 #region Virtual Method
 func _get_inputs() -> Array[Dictionary]:
@@ -48,7 +46,6 @@ func _perform(context: YSNContext) -> void
 func _is_stateless() -> bool:
 	return false
 #endregion
-
 
 #region Editor
 func _editor_get_name() -> String:

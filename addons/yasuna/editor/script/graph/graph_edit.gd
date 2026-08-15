@@ -52,7 +52,13 @@ func _on_connection_drag_started(from_node: StringName, from_port: int, is_outpu
 	# left_disconnects = true
 
 
-func _on_connection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int, connecting: bool) -> void:
+func _on_connection_request(
+	from_node: StringName,
+	from_port: int,
+	to_node: StringName,
+	to_port: int,
+	connecting: bool,
+) -> void:
 	var from_cue := get_node(String(from_node)) as _GraphNodeCue
 	var to_cue := get_node(String(to_node)) as _GraphNodeCue
 	if not (from_cue and to_cue):

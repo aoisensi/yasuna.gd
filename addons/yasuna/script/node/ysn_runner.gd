@@ -9,7 +9,6 @@ var _auto_acts: Array[Dictionary]
 func _ready() -> void:
 	call_deferred(&'_do_auto_act')
 
-
 #region Property Access
 func _get_property_list() -> Array[Dictionary]:
 	var properties: Array[Dictionary] = []
@@ -82,14 +81,12 @@ func _set(property: StringName, value: Variant) -> bool:
 	return false
 #endregion
 
-
 #region Public Methods
 func act(scenario: YSNScenario, begin_name := &'main') -> void:
 	var instance := YSNInstance.new(self, scenario)
 	_instances.append(instance)
 	instance._begin(begin_name)
 #endregion
-
 
 func _do_auto_act() -> void:
 	for a in _auto_acts:
