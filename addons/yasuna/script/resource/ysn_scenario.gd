@@ -7,6 +7,7 @@ var _elements: Dictionary[int, YSNElement]
 var _positions: Dictionary[int, Vector2]
 var _next_element_id: int = 1
 
+
 #region Property Access
 func _get_property_list() -> Array[Dictionary]:
 	var list: Array[Dictionary] = [
@@ -91,6 +92,7 @@ func _set(property: StringName, value: Variant) -> bool:
 					return true
 	return false
 #endregion
+
 
 #region Public Methods
 func add_element(element: YSNElement, position := Vector2.ZERO, id := -1) -> int:
@@ -179,6 +181,7 @@ func set_element_position(id: int, position: Vector2) -> void:
 	emit_changed()
 #endregion
 
+
 func _get_connections() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	_iter_connections(
@@ -222,12 +225,27 @@ func _disconnect(from_cue: int, from_flow: StringName, to_cue: int, to_flow: Str
 
 
 func _validate_connections() -> void:
-	var froms: Array[String] = _connections.keys()
-	for from in froms:
-		var to := _connections[from]
-		var from_s := from.split('/')
-		var to_s := to.split('/')
-		var from_id := int(from_s[0])
-		var to_id := int(to_s[1])
-		if _elements.get(from_id) is not YSNCue or _elements.get(to_id) is not YSNCue:
+	for from in _connections:
+		if not _validate_connection(from):
 			_connections.erase(from)
+
+
+func _validate_connection(from: String) -> bool:
+	var from_s := from.split('/')
+	if from_s.size() != 2:
+		return false
+	var from_id := int(from_s[0])
+	if from_id <= 0:
+		return false
+	var to := _connections[from]
+	var to_s := to.split('/')
+	if to_s.size() != 2:
+		return false
+	var to_id := int(to_s[0])
+	if to_id <= 0:
+		return false
+	if _elements.get(from_id) is not YSNCue:
+		return false
+	if _elements.get(to_id) is not YSNCue:
+		return false
+	return true
